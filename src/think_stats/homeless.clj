@@ -1,7 +1,9 @@
 (ns think-stats.homeless)
 
 (defn select*
-  [s field]
-  (for [r s] (get r field)))
+  [s fields] 
+   (for [r s] 
+     (select-keys r fields)))
+
 
 

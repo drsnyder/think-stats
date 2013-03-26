@@ -24,3 +24,10 @@
   [s]
   (Math/sqrt (variance s)))
 
+(defn pmf
+  [s]
+  (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
+  (let [n (count s)]
+    (into {} (map 
+               #(vector (first %) (/ (second %) n)) 
+               (frequencies s)))))
