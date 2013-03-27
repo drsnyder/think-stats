@@ -22,6 +22,9 @@ put them into the ./tmp directory.
     (def fb-prglength (for [r first-born] (get r "prglength")))
     (def rb-prglength (for [r rest-born] (get r "prglength")))
 
+    ; ploting the hist of prglength by birthord
+    (def prg-len-by-ord (concat (list (list "birthord" "prglength")) (for [r db] (list (get r "birthord") (get r "prglength"))))) 
+
 
 ## License
 
