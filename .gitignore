@@ -13,3 +13,4 @@ pom.xml.asc
 /tmp
 /plots/*.png
 .R*
+Rplots.pdf
