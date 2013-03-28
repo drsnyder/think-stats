@@ -31,3 +31,14 @@
     (into {} (map 
                #(vector (first %) (/ (second %) n)) 
                (frequencies s)))))
+
+
+(defn pmf->remaining-lifetime
+  [pmf] 
+  (reduce (fn [acc v]
+            (assoc acc (first v)
+                   (reduce + 
+                           (map second 
+                                (filter #(> (first %) (first v)) 
+                                        pmf)))))
+            {} pmf))
