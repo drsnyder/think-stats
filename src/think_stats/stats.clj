@@ -24,6 +24,13 @@
   [s]
   (Math/sqrt (variance s)))
 
+
+(defn hist
+  [s]
+  (assert (sequential? s) "Cannot compute the hist on a non-seq.")
+  (frequencies s))
+
+
 (defn pmf
   [s]
   (assert (sequential? s) "Cannot compute the pmf on a non-seq.")

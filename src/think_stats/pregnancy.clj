@@ -1,6 +1,7 @@
 (ns think-stats.pregnancy
   (:require (think-stats
               [util :as util]
+              [stats :as stats]
               [survey :as s])))
 
 (def fields [(s/def-field-extractor "caseid" 0 12)
@@ -22,14 +23,12 @@
   [data-file csv-out r-script]
   (let [preg-data (util/read-file data-file :gunzip true)
         db (map (partial s/line->fields fields) preg-data)
-        prg-len-by-ord (concat 
-                         ; header
-                         (list (list "birthord" "prglength")) 
-                         ; row tuples with nil's removed
-                         (for [r db :when (not= (get r "birthord") nil)] 
-                           (list 
-                             (if (= (get r "birthord") 1) "first babies" "others") 
-                             (get r "prglength"))))]
-    (util/write-to-csv csv-out prg-len-by-ord)
+        first-babies (stats/hist (for [r db :when (= (get r "birthord") 1)] (get r "prglength")))
+        other-babies (stats/hist (for [r db :when (not= (get r "birthord") 1)] (get r "prglength")))
+        upper (+ (max (apply max (keys first-babies)) (apply max (keys other-babies))) 1)
+        lower (min (apply min (keys first-babies)) (apply min (keys other-babies)))
+        combined (concat (list (list "prglength" "first" "others")) 
+                         (for [i (range lower upper)] (list i (get first-babies i 0) (get other-babies i 0))))]
+    (util/write-to-csv csv-out combined)
     (util/shell-exec (format "Rscript %s %s" r-script csv-out))))
 
