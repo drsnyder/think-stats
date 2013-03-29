@@ -13,6 +13,6 @@ require(reshape2)
 # with hist-data
 args <- commandArgs(TRUE)
 preglen <- read.csv(args[1], header = TRUE)
-preglen.m <- melt(preglen, id="prglength", measure = c("first", "others"))
-ggplot(preglen.m, aes(prglength, value, color=variable)) + geom_bar(stat="identity", position="dodge")
+preglen.m <- melt(preglen, id="prglength", variable.name = "order", measure = c("first", "others"))
+ggplot(preglen.m, aes(prglength, value, fill=order)) + geom_bar(stat="identity", position="dodge", width=0.9)
 ggsave("plots/2.1.png")
