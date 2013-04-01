@@ -13,6 +13,7 @@ put them into the ./tmp directory.
     (require '[think-stats.pregnancy :as preg])
     (require '[think-stats.stats :as stats])
 
+    ; looking at the data
     (def preg (util/read-file "tmp/2002FemPreg.dat.gz" :gunzip true))
     (def db (map (partial s/line->fields preg/fields) preg))
 
@@ -23,7 +24,8 @@ put them into the ./tmp directory.
     (def rb-prglength (for [r rest-born] (get r "prglength")))
 
     ; ploting the hist of prglength by birthord
-    (def prg-len-by-ord (concat (list (list "birthord" "prglength")) (for [r db] (list (get r "birthord") (get r "prglength"))))) 
+    (preg/plot-length-hist "tmp/2002FemPreg.dat.gz")  
+    (preg/plot-diff-hist "tmp/2002FemPreg.dat.gz")  
 
 
 ## License
