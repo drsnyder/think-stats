@@ -39,6 +39,9 @@
                #(vector (first %) (/ (second %) n)) 
                (frequencies s)))))
 
+(defn pmf->key-ordered
+  [pmf &{:keys [dir] :or {dir :asc}}]
+  (apply sorted-map-by (if (= dir :asc) < >) (flatten (seq pmf))))
 
 (defn pmf->remaining-lifetime
   [pmf] 
