@@ -26,3 +26,6 @@
        ((stats/pmf->remaining-lifetime (stats/pmf [0 1 1 2 2])) 2) => 2/5
        ((stats/pmf->remaining-lifetime (stats/pmf [0 1 1 2 2])) 1) => 4/5
        ((stats/pmf->remaining-lifetime (stats/pmf [0 1 1 2 2])) 0) => 5/5)
+
+(facts :binning
+       (stats/bin-pmf-freq (stats/pmf [1 1 1 2 2 2 3 3 3]) #{2 3}) => 6/9)

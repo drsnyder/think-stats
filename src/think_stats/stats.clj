@@ -83,6 +83,11 @@
               (square (- (pmf-entry->value %) m))) 
            pmf))))
 
+(defn bin-pmf-freq
+  [pmf binfn]
+  (sum (map pmf-entry->freq 
+            (filter #(binfn (pmf-entry->value %)) 
+                    (seq pmf)))))
 
 
 
