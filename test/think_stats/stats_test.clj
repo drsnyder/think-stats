@@ -22,6 +22,10 @@
        ((stats/hist [1 2 3 4 4]) 4) > 2
        ((stats/hist [1 2 3 4 4]) 1) > 1)
 
+(facts :trim 
+       (stats/trim (range 1 11) 0.1) => '(2 3 4 5 6 7 8 9)
+       (stats/trim (range 1 11) 0.5) => '())
+
 (facts :lifetime
        ((stats/pmf->remaining-lifetime (stats/pmf [0 1 1 2 2])) 2) => 2/5
        ((stats/pmf->remaining-lifetime (stats/pmf [0 1 1 2 2])) 1) => 4/5

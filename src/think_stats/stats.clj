@@ -35,6 +35,18 @@
   (frequencies s))
 
 
+(defn trim
+  "Trim's s by taking p % elements from both ends. The sequence is sorted before being trimmed."
+  ([s p]
+   (assert (sequential? s) "Cannot trim a non-seq.")
+   (let [s (sort s)
+         len (count s)
+         n (int (* p len))]
+     (drop n (take (- len n) s))))
+  ([s]
+   (trim s 0.01)))
+
+
 (defn pmf
   [s]
   (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
@@ -83,7 +95,10 @@
               (square (- (pmf-entry->value %) m))) 
            pmf))))
 
+
 (defn bin-pmf-freq
+  "Bin PMF values by applying binfn to each value in the PMF. 
+  The resulting bins contain the sum of the frequencies that mapped to that bin."
   [pmf binfn]
   (sum (map pmf-entry->freq 
             (filter #(binfn (pmf-entry->value %)) 

@@ -20,7 +20,7 @@
 
 (defn plot-length-hist
   [data-file &{:keys [csv-out r-script to-plot week-min week-max week-min week-max] 
-               :or {csv-out "plots/out.csv" r-script "plots/2.1.R" to-plot "plots/2.1.png" week-min 35 week-max 45} 
+               :or {csv-out "plots/out.csv" r-script "plots/2.1.R" to-plot "plots/2.1.png" week-min 0 week-max 99} 
                :as params}]
   (let [[first-babies other-babies] (map stats/hist (apply load-data data-file params))
         upper (+ (max (apply max (keys first-babies)) (apply max (keys other-babies))) 1)
@@ -32,7 +32,7 @@
 
 (defn plot-diff-hist
   [data-file &{:keys [csv-out r-script to-plot week-min week-max] 
-               :or {csv-out "plots/out.csv" r-script "plots/2.3.R" to-plot "plots/2.3.png" week-min 35 week-max 45} 
+               :or {csv-out "plots/out.csv" r-script "plots/2.3.R" to-plot "plots/2.3.png" week-min 0 week-max 99} 
                :as params}]
   (let [[first-babies other-babies] (map stats/pmf (apply load-data data-file params))
         upper (+ (max (apply max (keys first-babies)) (apply max (keys other-babies))) 1)
@@ -53,17 +53,17 @@
   (float (stats/bin-pmf-freq pmf binfn)))
 
 (defn early
-  [pmf &{:keys [binfn] :or {binfn #(< % 37)}}]
+  [pmf &{:keys [binfn] :or {binfn (set (range 0 38))}}]
   (float (stats/bin-pmf-freq pmf binfn)))
 
 (defn late
-  [pmf &{:keys [binfn] :or {binfn #(> % 40)}}]
+  [pmf &{:keys [binfn] :or {binfn (set (range 41 51))}}]
   (float (stats/bin-pmf-freq pmf binfn)))
 
 
 (defn risk
   [data-file & params]
-  (let [[first-babies other-babies live] (map stats/pmf (apply load-data data-file params))]
+  (let [[first-babies other-babies live] (map (comp stats/pmf stats/trim) (apply load-data data-file params))]
     {:first
      {:on-time (on-time first-babies)
       :early (early first-babies)
@@ -78,21 +78,20 @@
       :late (late live)}}))
 
 
-; FIXME: instead of filtering by week, trim a % off the front and back
 (defn load-data
-  [data-file &{:keys [week-min week-max] :or {week-min 35 week-max 45} :as params}]
-  (prn week-min week-max)
+  [data-file &{:keys [week-min week-max] :or {week-min 0 week-max 99} :as params}]
   (let [preg-data (util/read-file data-file :gunzip true)
         db (map (partial s/line->fields fields) preg-data)
         predicate (fn [r] 
                     (when-let [len (get r "prglength")]
                       (and 
+                        (get r "birthord" nil)
                         (= (get r "outcome") 1) ; only live births
                         (>= len week-min)
                         (<= len week-max))))
-        first-babies (for [r db :when (and (= (get r "birthord") 1) (predicate r))] (get r "prglength"))
-        other-babies (for [r db :when (and (not= (get r "birthord") 1) (predicate r))] (get r "prglength"))
-        live-births  (for [r db :when (and (= (get r "outcome") 1) (predicate r))] (get r "prglength"))]
+        first-babies (for [r db :when (and (predicate r) (= (get r "birthord") 1))] (get r "prglength"))
+        other-babies (for [r db :when (and (predicate r) (not= (get r "birthord") 1))] (get r "prglength"))
+        live-births  (for [r db :when (and (predicate r) (= (get r "outcome") 1))] (get r "prglength"))]
     [first-babies other-babies live-births]))
 
 
