@@ -104,6 +104,20 @@
             (filter #(binfn (pmf-entry->value %)) 
                     (seq pmf)))))
 
+(defn filter-map
+  "Filter a map by the keys matching (f k)."
+  [pmf f]
+  (select-keys pmf (for [[k v] pmf :when (f k)] k)))
+
+
+(defn normalize-pmf
+  ([pmf fraction]
+   (if (empty? pmf)
+     pmf
+     (let [factor (/ fraction (sum (vals pmf)))]
+       (into {} (for [[k v] pmf] [k (* v factor)])))))
+  ([pmf]
+   (normalize-pmf pmf 1.0)))
 
 
 
