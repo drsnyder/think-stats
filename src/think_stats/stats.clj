@@ -63,9 +63,11 @@
   [e]
   (second e))
 
+
 (defn pmf->key-ordered
   [pmf &{:keys [dir] :or {dir :asc}}]
   (apply sorted-map-by (if (= dir :asc) < >) (flatten (seq pmf))))
+
 
 (defn pmf->remaining-lifetime
   [pmf] 
@@ -120,6 +122,15 @@
    (normalize-pmf pmf 1.0)))
 
 
+(defn bias-pmf
+  "Bias a PMF (or unbias if invert is true). If the PMF is the distribution of reported values then
+  any oversampling would be in proportion to the values. See the class size example. And the 3-size plot."
+  [pmf &{:keys [invert] :or {invert false}}]
+  (let [transf (if invert 
+                (fn [k v] (* v (/ 1 k))) 
+                (fn [k v] (* v k)))
+        t (into {} (for [[k v] pmf] [k (transf k v)]))]
+    (normalize-pmf t)))
 
 
 

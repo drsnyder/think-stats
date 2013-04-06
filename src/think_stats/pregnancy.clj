@@ -99,7 +99,6 @@
 
 
 
-
 (defn load-data
   [data-file &{:keys [week-min week-max] :or {week-min 0 week-max 99} :as params}]
   (let [preg-data (util/read-file data-file :gunzip true)
@@ -115,7 +114,6 @@
         other-babies (for [r db :when (and (predicate r) (not= (get r "birthord") 1))] (get r "prglength"))
         live-births  (for [r db :when (and (predicate r) (= (get r "outcome") 1))] (get r "prglength"))]
     [first-babies other-babies live-births]))
-
 
 
 
