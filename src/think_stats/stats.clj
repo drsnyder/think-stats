@@ -122,7 +122,7 @@
    (normalize-pmf pmf 1.0)))
 
 
-(defn bias-pmf
+(defn pmf->biased
   "Bias a PMF (or unbias if invert is true). If the PMF is the distribution of reported values then
   any oversampling would be in proportion to the values. See the class size example. And the 3-size plot."
   [pmf &{:keys [invert] :or {invert false}}]
@@ -131,6 +131,11 @@
                 (fn [k v] (* v k)))
         t (into {} (for [[k v] pmf] [k (transf k v)]))]
     (normalize-pmf t)))
+
+(defn pmf->unbiased
+  [pmf]
+  (pmf->biased pmf :invert true))
+
 
 
 
