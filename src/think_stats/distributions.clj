@@ -15,12 +15,12 @@
   (let [pivot-value (nth l idx)
         store-index (atom left)]
     (vswap! l idx right)
-    (doall
-      (for [i (range left right)]
-        (do
-          (when (< (nth l i) pivot-value)
-            (vswap! l @store-index i)
-            (swap! store-index inc)))))
+    (loop [i left]
+      (when (< (nth l i) pivot-value)
+        (vswap! l @store-index i)
+        (swap! store-index inc))
+      (when (< i right)
+        (recur (inc i))))
     (vswap! l right @store-index) 
     @store-index))
 
@@ -29,6 +29,8 @@
   [l left right k]
   (if (= left right)
     (nth l left)
+    ; this is an arbitrary selection of the pivot index that may not serve use
+    ; well in some cases
     (let [new-index (partition l left right (int (/ (+ left right) 2)))
           dist (inc (- new-index left))]
       (cond 
@@ -39,6 +41,25 @@
 
 (defn percentile
   [s k]
-  (let [scaled-k (int (* (count s) (/ k 100)))]
+  (let [scaled-k (* (count s) (/ k 100))
+        s (vec s)] ; force realization if lazy
     (select (transient s) 0 (dec (count s)) scaled-k)))
+
+(defn percentile-rank
+  [scores yours]
+  (* (/ 
+       (count (filter #(<= % yours) scores)) 
+       (count scores)) 
+    100.0))
+
+(defn percentile-s
+  [scores rank]
+  (let [scores (sort scores)
+        len (count scores)
+        rank (/ rank 100.0)]
+    (loop [s scores
+           current-rank 1]
+      (if (>= (/ current-rank len) rank)
+        (first s)
+        (recur (rest s) (inc current-rank))))))
 

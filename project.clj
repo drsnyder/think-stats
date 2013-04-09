@@ -10,4 +10,5 @@
                  [lonocloud/synthread "1.0.3"]
                  [org.clojure/data.csv "0.1.2"]
                  [midje "1.5.0"]
-                 [environ "0.2.1"]])
+                 [environ "0.2.1"]]
+  :jvm-opts ["-Xmx512m" "-server"])
