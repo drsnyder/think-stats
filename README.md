@@ -27,6 +27,25 @@ put them into the ./tmp directory.
     (preg/plot-length-hist "tmp/2002FemPreg.dat.gz")  
     (preg/plot-diff-hist "tmp/2002FemPreg.dat.gz")  
 
+## Chapter 3
+
+    (def sample-r1m (take 1000000 (repeatedly #(inc (rand 99)))))
+
+    (time (d/percentile-s sample-r1m 50))
+    "Elapsed time: 1180.638 msecs"
+    50.460172154741564
+
+    (time (d/percentile-c sample-r1m 50))
+    "Elapsed time: 815.941 msecs"
+    50.460172154741564
+
+    (time (d/percentile sample-r1m 50))
+    "Elapsed time: 632.59 msecs"
+    50.460172154741564
+
+
+
+    
 
 ## License
 
