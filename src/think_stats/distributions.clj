@@ -42,6 +42,7 @@
   (assert (sequential? s) "Cannot compute the cdf on a non-seq.")
   (let [s (sort s)
         len (count s)
+        x (max 0 (min x 100))
         c (+ (* (/ x 100) len) 0.5)
         idx (dec c)] ; zero offset
     (nth s idx)))
