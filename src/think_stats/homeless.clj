@@ -26,20 +26,28 @@
     (vswap! l right @store-index) 
     @store-index))
 
-; see http://en.wikipedia.org/wiki/Selection_algorithm
-(defn select 
+(defn- select-with-transient
   [l left right k]
-  (if (= left right)
-    (nth l left)
-    ; this is an arbitrary selection of the pivot index that may not serve use
-    ; well in some cases
-    (let [new-index (partition-by-idx l left right (int (/ (+ left right) 2)))
-          dist (inc (- new-index left))]
-      (cond 
-        (= dist k) (nth l new-index)
-        (= new-index k) (nth l new-index) ; same as above
-        (< k dist) (select l left (dec new-index) k)
-        :else (select l (inc new-index) right (- k dist))))))
+    (loop [lt (transient l) left left right right k k]
+      (if (= left right)
+        (nth lt left)
+        ; this is an arbitrary selection of the pivot index that may not serve use
+        ; well in some cases
+        (let [new-index (partition-by-idx lt left right (quot (+ left right) 2))
+              dist (inc (- new-index left))
+              found (if (= dist k) (nth lt new-index))
+              [new-left new-right new-k] (if 
+                                           (< k dist) [left (dec new-index) k]
+                                           [(inc new-index) right (- k dist)])]
+              (if found
+                found
+                (recur lt new-left new-right new-k))))))
+
+(defn select
+  "See http://en.wikipedia.org/wiki/Selection_algorithm"
+  [l left right k]
+  (select-with-transient l left right k))
+
 
 (defmulti compute-bisection-ends (fn [dir s x low mid high] dir))
 
@@ -59,15 +67,20 @@
   ([dir s x low mid high]
    (compute-bisection-ends :right s x low mid high)))
 
+
 (defn bisect
+  "When dir is :right find the insertion point idx in s such that all e (take idx x) satisfies e <= x.
+  When dir il :left find the insertion point idx in s such that all e (take idx x) satisfies e < x.
+
+  Assumes that s is sorted."
   [s x & [dir]] 
+  (assert (sequential? s) "Cannot bisect a non-seq.")
   (loop [low 0 
          high (count s)]
     (if (>= low high)
       low
       (let [mid (quot (+ low high) 2)
             [l h] (compute-bisection-ends dir s x low mid high)]
-        (prn (>= high 10) low mid high x)
         (recur l h)))))
     
 

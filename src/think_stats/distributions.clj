@@ -7,10 +7,15 @@
 
 
 (defn percentile
+  "A more efficient percentile that uses a selection algorithm
+  http://en.wikipedia.org/wiki/Selection_algorithm. 
+
+  \"More efficient\" should be taken with a grain of salt. YMMV and it probably depends on the data set.
+  "
   [s k]
   (let [scaled-k (* (count s) (/ k 100))
-        s (vec s)] ; force realization if lazy
-    (h/select (transient s) 0 (dec (count s)) scaled-k)))
+        s (vec s)] 
+    (h/select s 0 (dec (count s)) scaled-k)))
 
 (defn percentile-rank
   [scores yours]
@@ -31,8 +36,8 @@
         (first s)
         (recur (rest s) (inc current-rank))))))
 
-(defn percentile-c
-  "http://en.wikipedia.org/wiki/Percentile"
+(defn percentile-w
+  "Wikipedia implementation http://en.wikipedia.org/wiki/Percentile"
   [s x]
   (assert (sequential? s) "Cannot compute the cdf on a non-seq.")
   (let [s (sort s)
