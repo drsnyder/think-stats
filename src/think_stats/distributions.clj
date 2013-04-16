@@ -83,6 +83,14 @@
         (let [kidx (h/bisect kys x :left)]
           (nth vls kidx))))))
 
+(defn sample
+  [cdf n]
+  (let [kys (keys cdf)
+        len (count kys)]
+    (for [i (range n)]
+      (nth kys (rand-int len)))))
+
+
       
 
 
