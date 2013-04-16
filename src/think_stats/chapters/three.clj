@@ -63,7 +63,6 @@
    (let [speeds (map #(Float/parseFloat %) 
                      (clojure.string/split (slurp "data/speeds.txt") #"\n"))
          speeds-cdf (h/map-map float (d/cdf speeds) :dest (sorted-map))
-         j (prn speeds-cdf)
          speeds-csv (concat (list (list "speed" "cdf(x)")) 
                             (for [k (keys speeds-cdf)] (list k 
                                                              (speeds-cdf k))))]
