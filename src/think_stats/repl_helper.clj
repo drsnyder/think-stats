@@ -5,5 +5,6 @@
                          [distributions :as d]
                          [pregnancy :as preg]
                          [stats :as stats])
+            (think-stats.chapters [three :as three])
             [midje.repl :refer :all]))
 
