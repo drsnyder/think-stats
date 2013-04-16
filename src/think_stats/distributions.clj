@@ -39,7 +39,7 @@
 (defn percentile-w
   "Wikipedia implementation http://en.wikipedia.org/wiki/Percentile"
   [s x]
-  (assert (sequential? s) "Cannot compute the cdf on a non-seq.")
+  (assert (sequential? s) "Cannot compute the percentile on a non-seq data set.")
   (let [s (sort s)
         len (count s)
         x (max 0 (min x 100))
@@ -48,22 +48,42 @@
     (nth s idx)))
 
 
-(defn compute-cdf
+(defn compute-cdf-value
   [s x]
-  (assert (sequential? s) "Cannot compute the cdf on a non-seq.")
+  (assert (sequential? s) "Cannot compute the cdf on a non-seq data set.")
   (/ 
     (count (filter #(<= % x) s)) 
     (count s)))
 
 (defn cdf
   [s]
-  (assert (sequential? s) "Cannot compute the cdf on a non-seq.")
-  (let [len (count s)]
-    (into {} 
-          (loop [s' s idx 1 acc []]
-            (if (empty? s')
-              acc
-              (recur (rest s') (inc idx) (conj acc [(first s') (/ idx len)])))))))
+  (assert (sequential? s) "Cannot compute the cdf on a non-seq data set.")
+  (let [s (sort s)
+        len (count s)
+        m (into (sorted-map)
+                (loop [s' s idx 1 acc []]
+                  (if (empty? s')
+                    acc
+                    (recur (rest s') (inc idx) (conj acc [(first s') (/ idx len)])))))]
+        m))
+
+
+(defn cdff
+  "Returns a function (f x) that computes the CDF(x) from the data set s."
+  [s]
+  (assert (sequential? s) "Cannot compute the cdf on a non-seq data set.")
+  (let [m (cdf s)
+        kys (keys m)
+        vls (vals m)]
+    (fn [x]
+      (cond
+        (< x (first kys)) 0
+        (> x (last kys)) (last kys)
+        :else 
+        (let [kidx (h/bisect kys x)]
+          (nth vls kidx))))))
+
+      
 
 
 
