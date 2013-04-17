@@ -18,5 +18,10 @@
         (cdf 3) => 3/5
         (cdf 4) => 4/5
         (cdf 5) => 1
-        (cdf 6) => 1))
+        (cdf 6) => 1)
+
+      (let [cdf (d/cdff (range 1 101))]
+        (cdf 10) => 1/10
+        (cdf 0.1 :value) => 10))
+
 
