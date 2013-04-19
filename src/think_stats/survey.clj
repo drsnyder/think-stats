@@ -2,6 +2,19 @@
   (:require (think-stats
               [util :as util])))
 
+(declare def-field-extractor)
+
+(def fields [(def-field-extractor "caseid" 0 12)
+             (def-field-extractor "nbrnaliv" 21 22)
+             (def-field-extractor "babysex" 55 56)
+             (def-field-extractor "birthwgt_lb" 56 58)
+             (def-field-extractor "birthwgt_oz" 58 60)
+             (def-field-extractor "prglength" 274 276)
+             (def-field-extractor "outcome" 276 277)
+             (def-field-extractor "birthord" 277 279)
+             (def-field-extractor "agepreg" 284 287)
+             (def-field-extractor "finalwgt" 422 440 util/str-to-float)])
+
 (defn extract-field 
   [s off len]
   (clojure.string/trim (subs s off len)))

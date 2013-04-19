@@ -4,16 +4,6 @@
               [stats :as stats]
               [survey :as s])))
 
-(def fields [(s/def-field-extractor "caseid" 0 12)
-             (s/def-field-extractor "nbrnaliv" 21 22)
-             (s/def-field-extractor "babysex" 55 56)
-             (s/def-field-extractor "birthwgt_lb" 56 58)
-             (s/def-field-extractor "birthwgt_oz" 58 60)
-             (s/def-field-extractor "prglength" 274 276)
-             (s/def-field-extractor "outcome" 276 277)
-             (s/def-field-extractor "birthord" 277 279)
-             (s/def-field-extractor "agepreg" 284 287)
-             (s/def-field-extractor "finalwgt" 422 440 util/str-to-float)])
 
 
 (declare load-data)
@@ -102,7 +92,7 @@
 (defn load-data
   [data-file &{:keys [week-min week-max] :or {week-min 0 week-max 99} :as params}]
   (let [preg-data (util/read-file data-file :gunzip true)
-        db (map (partial s/line->fields fields) preg-data)
+        db (map (partial s/line->fields s/fields) preg-data)
         predicate (fn [r] 
                     (when-let [len (get r "prglength")]
                       (and 
