@@ -2,6 +2,9 @@
 
 [Think Stats](http://www.greenteapress.com/thinkstats/) in Clojure.
 
+## TODO
+
+ * Generalized plotting of PMFs & CDFs
 
 ## Usage
 

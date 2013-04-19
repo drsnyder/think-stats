@@ -70,30 +70,12 @@
      (util/write-to-csv csv-out speeds-csv)
      (util/shell-exec (format "Rscript %s %s %s" r-script csv-out to-plot)))))
 
-
+(declare birth-weight-data)
 (defn birth-weight-cdfs
   [data-file &{:keys [csv-out r-script to-plot] 
       :or {csv-out "plots/3-birthweights-cdf.csv" r-script "plots/3-birthweights-cdf.R" 
            to-plot "plots/3-birthweights-cdf.png"}}]
-   (let [preg-data (util/read-file data-file :gunzip true)
-         db (map (partial s/line->fields s/fields) preg-data)
-         predicate (fn [r] 
-                     (when-let [len (get r "prglength")]
-                       (and 
-                         (get r "birthwgt_lb" nil)
-                         (get r "birthwgt_oz" nil)
-                         (get r "birthord" nil)
-                         (= (get r "outcome") 1)))) ; only live births
-         all (for [r db :when (predicate r)]
-               (if (and (not= (get r "birthwgt_lb") "NA")
-                        (< (get r "birthwgt_lb") 20)
-                        (not= (get r "birthwgt_oz") "NA")
-                        (<= (get r "birthwgt_oz") 16))
-                 (assoc r "totalwgt_oz" (+ (* (get r "birthwgt_lb") 16) 
-                                           (get r "birthwgt_oz")))
-                 (assoc r "totalwgt_oz" "NA")))
-         totalwgts (for [r all :when (not= (get r "totalwgt_oz") "NA")] 
-                     (get r "totalwgt_oz"))
+  (let [totalwgts (birth-weight-data data-file)
          cdf-data (d/cdf totalwgts)
          cdf (d/cdff totalwgts)
          cdf-sample-data (d/cdf (d/sample cdf 1000))
@@ -106,6 +88,28 @@
      (util/write-to-csv csv-out csv)
      (util/shell-exec (format "Rscript %s %s %s" r-script csv-out to-plot))))
 
+(defn birth-weight-data
+  [data-file]
+  (let [preg-data (util/read-file data-file :gunzip true)
+        db (map (partial s/line->fields s/fields) preg-data)
+        predicate (fn [r] 
+                    (when-let [len (get r "prglength")]
+                      (and 
+                        (get r "birthwgt_lb" nil)
+                        (get r "birthwgt_oz" nil)
+                        (get r "birthord" nil)
+                        (= (get r "outcome") 1)))) ; only live births
+        all (for [r db :when (predicate r)]
+              (if (and (not= (get r "birthwgt_lb") "NA")
+                       (< (get r "birthwgt_lb") 20)
+                       (not= (get r "birthwgt_oz") "NA")
+                       (<= (get r "birthwgt_oz") 16))
+                (assoc r "totalwgt_oz" (+ (* (get r "birthwgt_lb") 16) 
+                                          (get r "birthwgt_oz")))
+                (assoc r "totalwgt_oz" "NA")))
+        totalwgts (for [r all :when (not= (get r "totalwgt_oz") "NA")] 
+                    (get r "totalwgt_oz"))]
+    totalwgts))
 
 
 
