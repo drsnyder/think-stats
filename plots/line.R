@@ -10,7 +10,7 @@ print(args)
 ggplot(data, aes(x=x)) + 
     geom_line(aes(y=y, color="x")) + 
     scale_colour_manual("", breaks=c("y"), values=c("blue")) +
-    labs(y="CDF", x="x", title=args[2]) 
+    labs(y="y", x="x", title=args[2]) 
 ggsave(args[3])
 
 

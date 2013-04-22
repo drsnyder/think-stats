@@ -96,11 +96,12 @@
   (cdf 0.1 :value) => 10
 
   "
-  [s]
+  [s &{:keys [to-float] :or {to-float false}}]
   (assert (sequential? s) "Cannot compute the cdf on a non-seq data set.")
   (let [m (cdf s)
         kys (keys m)
-        vls (vals m)]
+        vls (vals m)
+        vls (if to-float (map float vls) vls)]
     (fn [x &[direction]]
       (if (and (not (nil? direction)) (= direction :value))
         (cdf->value kys vls x)
@@ -129,8 +130,15 @@
   (for [i (range n)]
     (cdf (rand) :value)))
 
+(defn expovariate
+  [λ]
+  (* -1.0 (/ (Math/log (- 1.0 (rand))) (float λ))))
 
-(defn exponential
+
+(defn exponential->cdf
+  "Exponential distribution.
+  Describes the time between events in a Poisson process.
+  mean: 1/λ, median: log(2)/λ."
   [λ x]
   (- 1 (Math/exp (* -1 λ x))))
       

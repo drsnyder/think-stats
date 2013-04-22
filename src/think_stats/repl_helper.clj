@@ -4,7 +4,8 @@
                          [survey :as s]
                          [distributions :as d]
                          [pregnancy :as preg]
-                         [stats :as stats])
+                         [stats :as stats]
+                         [plots :as plots])
             (think-stats.chapters [three :as three])
             [midje.repl :refer :all]))
 

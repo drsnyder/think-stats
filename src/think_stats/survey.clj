@@ -2,7 +2,13 @@
   (:require (think-stats
               [util :as util])))
 
-(declare def-field-extractor)
+(defn def-field-extractor
+  ([field-name start end cast-f recode]
+   [field-name start end cast-f recode])
+  ([field-name start end cast-f]
+   (def-field-extractor field-name start end cast-f identity))
+  ([field-name start end]
+   (def-field-extractor field-name start end util/str-to-int identity)))
 
 (def fields [(def-field-extractor "caseid" 0 12)
              (def-field-extractor "nbrnaliv" 21 22)
@@ -19,13 +25,6 @@
   [s off len]
   (clojure.string/trim (subs s off len)))
 
-(defn def-field-extractor
-  ([field-name start end cast-f recode]
-   [field-name start end cast-f recode])
-  ([field-name start end cast-f]
-   (def-field-extractor field-name start end cast-f identity))
-  ([field-name start end]
-   (def-field-extractor field-name start end util/str-to-int identity)))
 
 
 (defn field-name
