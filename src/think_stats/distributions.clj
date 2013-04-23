@@ -130,17 +130,26 @@
   (for [i (range n)]
     (cdf (rand) :value)))
 
-(defn expovariate
-  [λ]
-  (* -1.0 (/ (Math/log (- 1.0 (rand))) (float λ))))
-
-
+; TODO: remove? not necessary?
 (defn exponential->cdf
   "Exponential distribution.
   Describes the time between events in a Poisson process.
   mean: 1/λ, median: log(2)/λ."
-  [λ x]
-  (- 1 (Math/exp (* -1 λ x))))
+  [lambda x]
+  (- 1 (Math/exp (* -1 lambda x))))
+
+(defn expovariate
+  "See http://en.wikipedia.org/wiki/Exponential_distribution generating exponential variates"
+  [lambda]
+  (* -1.0 (/ (Math/log (- 1.0 (rand))) (float lambda))))
+
+
+
+(defn paretovariate
+  "See http://en.wikipedia.org/wiki/Pareto_distribution for random sample generation."
+  [alpha]
+  (/ 1.0 (Math/pow (- 1.0 (rand)) 
+                 (/ 1 alpha))))
       
 
 
