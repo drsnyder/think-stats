@@ -138,6 +138,7 @@
   [lambda x]
   (- 1 (Math/exp (* -1 lambda x))))
 
+; TODO: testing. how?
 (defn expovariate
   "See http://en.wikipedia.org/wiki/Exponential_distribution generating exponential variates"
   [lambda]
@@ -145,6 +146,7 @@
 
 
 
+; TODO: testing. how?
 (defn paretovariate
   "See http://en.wikipedia.org/wiki/Pareto_distribution for random sample generation."
   [alpha]
