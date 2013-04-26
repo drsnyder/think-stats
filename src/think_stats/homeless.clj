@@ -84,8 +84,11 @@
         (recur l h)))))
     
 
-
-
+(defn approxiately-equal
+  ([a b r]
+   (>= r (Math/abs (- a b))))
+  ([a b]
+   (approxiately-equal a b 0.01)))
     
         
 
