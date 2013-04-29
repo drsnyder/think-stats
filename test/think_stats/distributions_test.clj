@@ -26,14 +26,38 @@
         (cdf 10) => 1/10
         (cdf 0.1 :value) => 10))
 
+(facts :exponential
+       (let [lambda 2
+             sample (repeatedly 100000 (fn [] (d/expovariate lambda)))
+             median (d/percentile sample 50)
+             mean (stats/mean sample)]
+         (h/approxiately-equal median (d/expomedian lambda)) => true
+         (h/approxiately-equal mean (d/expomean lambda)) => true))
+
+
 (facts :pareto :slow
-      (dorun
-        (for [alpha (range 2 10)
-              :let [x-min 1
-                    sample (repeatedly 100000 (fn [] (d/paretovariate alpha x-min)))
-                    median (d/percentile sample 50)
-                    mean   (stats/mean sample)]]
-          (and
-            (h/approxiately-equal median (d/paretomedian alpha x-min) 0.05)
-            (h/approxiately-equal mean (d/paretomean alpha x-min) 0.05)) => true)))
+       (let [alpha 1
+             threshold 0.5
+             sample (repeatedly 100000 (fn [] (d/paretovariate alpha threshold)))
+             cdf (d/cdff sample :to-float true)
+             ccdf (fn [x] (- 1 (cdf x)))
+             x1 0
+             y1 (Math/log (ccdf (Math/exp x1)))
+             x2 1
+             y2 (Math/log (ccdf (Math/exp x2)))]
+         ; intercept at alpha * Log(threshold)
+         (h/approxiately-equal (Math/log (ccdf (Math/exp 0))) (* alpha (Math/log threshold))) => true
+         ; slope at -alpha
+         (h/approxiately-equal (/ (- x2 x1) (- y2 y1)) (* -1 alpha)) => true)
+
+
+       (dorun
+         (for [alpha (range 2 10)
+               :let [x-min 1
+                     sample (repeatedly 100000 (fn [] (d/paretovariate alpha x-min)))
+                     median (d/percentile sample 50)
+                     mean   (stats/mean sample)]]
+           (and
+             (h/approxiately-equal median (d/paretomedian alpha x-min) 0.05)
+             (h/approxiately-equal mean (d/paretomean alpha x-min) 0.05)) => true)))
 

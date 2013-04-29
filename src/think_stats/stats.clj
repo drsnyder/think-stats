@@ -1,4 +1,5 @@
-(ns think-stats.stats)
+(ns think-stats.stats
+  (:require (think-stats [distributions :as d])))
 
 (defn sum
   [s]
@@ -27,6 +28,17 @@
 (defn stddev
   [s]
   (Math/sqrt (variance s)))
+
+
+(defn summary
+  [s]
+  {:min (apply min s)
+   :25th (d/percentile s 25)
+   :median (d/percentile s 50)
+   :mean (mean s)
+   :75th (d/percentile s 75)
+   :95th (d/percentile s 95)
+   :max (apply max s)})
 
 
 (defn hist

@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [partition])
   (:require (think-stats
               [util :as util]
-              [stats :as stats]
               [homeless :as h])))
 
 
@@ -130,13 +129,6 @@
   (for [i (range n)]
     (cdf (rand) :value)))
 
-; TODO: remove? not necessary?
-(defn exponential->cdf
-  "Exponential distribution.
-  Describes the time between events in a Poisson process.
-  mean: 1/λ, median: log(2)/λ."
-  [lambda x]
-  (- 1 (Math/exp (* -1 lambda x))))
 
 ; TODO: testing. how?
 (defn expovariate
@@ -144,9 +136,16 @@
   [lambda]
   (* -1.0 (/ (Math/log (- 1.0 (rand))) (float lambda))))
 
+(defn expomedian
+  [lambda]
+  (/ (Math/log 2) lambda))
+
+(defn expomean
+  [lambda]
+  (/ 1.0 lambda))
 
 
-; TODO: testing. how?
+
 (defn paretovariate
   "See http://en.wikipedia.org/wiki/Pareto_distribution for random sample generation."
   ([alpha x-min]

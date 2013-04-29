@@ -1,13 +1,19 @@
-# Rscript pareto.R data.csv 
+# Rscript pareto.R data.csv alpha threshold 
 require(ggplot2)
 require(reshape2)
 # 
 args <- commandArgs(TRUE)
 data <- read.csv(args[1], header = TRUE)
+alpha <- args[2]
+threshold <- args[3]
+print(alpha)
+print(threshold)
+
+title <- paste("Pareto CDF(x), α = ", alpha, ", threshold = ", threshold)
 ggplot(data, aes(x=x)) + 
     geom_line(aes(y=y, color="x")) + 
     scale_colour_manual("", breaks=c("y"), values=c("blue")) +
-    labs(y="CDF(x)", x="x", title="Pareto CDF(x)") 
+    labs(y="CDF(x)", x="x", title=title) 
 ggsave("plots/pareto-cdf.png")
 
 
