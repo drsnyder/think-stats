@@ -1,6 +1,5 @@
 (ns think-stats.homeless
-  (:require (think-stats [stats :as stats]
-                         [util :as util])))
+  (:require (think-stats [util :as util])))
 
 
 (defn map-map

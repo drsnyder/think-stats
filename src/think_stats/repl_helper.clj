@@ -6,6 +6,8 @@
                          [pregnancy :as preg]
                          [stats :as stats]
                          [plots :as plots])
-            (think-stats.chapters [three :as three])
+            (think-stats.chapters [three :as three]
+                                  [four :as four])
+            [clj-http.client :as client]
             [midje.repl :refer :all]))
 

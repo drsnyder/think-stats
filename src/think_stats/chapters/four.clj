@@ -3,7 +3,8 @@
                          [util :as util]
                          [survey :as s]
                          [homeless :as h]
-                         [distributions :as d])))
+                         [distributions :as d])
+            [clj-http.client :as client]))
 
 ; TODO: confirm that this has the slope and intesect that we expect
 (defn pareto-cdf
@@ -48,4 +49,7 @@
        :data e})))
 
 
+(defn zipfs
+  "4.5"
+  [corpus])
 
