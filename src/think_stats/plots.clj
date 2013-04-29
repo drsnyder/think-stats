@@ -27,3 +27,29 @@
     (util/shell-exec (format "Rscript %s %s %s %s" r-script csv-out title to-plot))))
 
 
+(defn line
+  "Line plot. Under the hood it uses a simple R line plotting script.
+
+  Example:
+
+  (def p (repeatedly 10000 (fn [] (d/paretovariate 1 0.5)))) 
+  (def cdf (d/cdff p :to-float true))
+  (def xs (range 0 10 0.1))
+  (def ys (map cdf xs))
+
+  (line xs ys :to-plot \"plots/pareto-cdf.png\")
+  (line (map #(Math/log %) xs) 
+        (map #(Math/log (- 1 %)) ys) 
+        :to-plot \"plots/pareto-ccdf.png\")
+
+  "
+  [x-vals y-vals &{:keys [r-script csv-out to-plot title] 
+                   :or {r-script "plots/line.R" csv-out "plots/line.csv" 
+                        to-plot "plots/line.png" title "line"}}]
+  (let [header (list (list "x" "y"))
+        data   (for [i (range 0 (count x-vals))] 
+                 (list (nth x-vals i nil) (nth y-vals i nil)))
+        csv    (concat header data)]
+    (util/write-to-csv csv-out csv)
+    (util/shell-exec (format "Rscript %s %s %s %s" r-script csv-out title to-plot))))
+

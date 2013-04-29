@@ -5,8 +5,6 @@ require(reshape2)
 # 
 args <- commandArgs(TRUE)
 data <- read.csv(args[1], header = TRUE)
-#data.m <- melt(data, id="x",  measure = c("y"))
-print(args)
 ggplot(data, aes(x=x)) + 
     geom_line(aes(y=y, color="x")) + 
     scale_colour_manual("", breaks=c("y"), values=c("blue")) +
