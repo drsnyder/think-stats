@@ -50,6 +50,6 @@
 
 
 (defn zipfs
-  "4.5"
+  "4.5 Get Anna Karenina, by Leo Tolstoy from here http://www.gutenberg.org/files/1399/1399-0.txt."
   [corpus])
 
