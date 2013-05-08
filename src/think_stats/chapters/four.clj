@@ -49,7 +49,34 @@
        :data e})))
 
 
-(defn zipfs
+(defn extract-features
   "4.5 Get Anna Karenina, by Leo Tolstoy from here http://www.gutenberg.org/files/1399/1399-0.txt."
-  [corpus])
+  [corpus &{:keys [min-len] :or {min-len 1}}]
+  (let [words (clojure.string/split corpus #"\s+")]
+    (->> words
+         (map clojure.string/lower-case)
+         (map #(clojure.string/replace % #"[^a-z]+" "") )
+         (filter #(> (count %) min-len)))))
+
+(defn corpus->zifs
+  "Given a corpus, extract the features, frequencies, and cdf. Returns a map with those keys.
+
+  $ curl http://www.gutenberg.org/files/1399/1399-0.txt > tmp/ak.txt
+  (def corpus (slurp \"tmp/ak.txt\"))
+
+  ; CDF
+  (plots/line (keys cdf) (map float (vals cdf))) 
+
+  ; CCDF on log-log 
+  (plots/line (map log (keys cdf)) (map #(log (- 1 %)) (map float (vals cdf)))) 
+  "
+  [corpus]
+  (let [features (extract-features corpus)
+        freq (frequencies features)
+        ; since these are discrete values, dedup the frequencies
+        cdf (d/cdf (distinct (vec (vals freq))))]
+    ; TODO: compute the x intercept and the slope
+    {:cdf cdf
+     :features features
+     :frequencies freq}))
 

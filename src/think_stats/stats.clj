@@ -63,9 +63,8 @@
   [s]
   (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
   (let [n (count s)]
-    (into {} (map 
-               #(vector (first %) (/ (second %) n)) 
-               (frequencies s)))))
+    (into {} (for [[k v] (frequencies s)]
+               [k (/ v n)]))))
 
 (defn pmf-entry->value
   [e]

@@ -1,4 +1,5 @@
 (ns think-stats.repl-helper
+  (:use '[clojure.repl :only (doc)])
   (:require (think-stats [util :as util]
                          [homeless :as h]
                          [survey :as s]
