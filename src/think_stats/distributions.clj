@@ -55,16 +55,15 @@
     (count s)))
 
 (defn cdf
-  [s]
+  [s &{:keys [to-float] :or {to-float false}}]
   (assert (sequential? s) "Cannot compute the cdf on a non-seq data set.")
   (let [s (sort s)
-        len (count s)
-        m (into (sorted-map)
-                (loop [s' s idx 1 acc []]
-                  (if (empty? s')
-                    acc
-                    (recur (rest s') (inc idx) (conj acc [(first s') (/ idx len)])))))]
-        m))
+        len (count s)]
+    (into (sorted-map)
+          (for [[r idx] (map vector s (range 1 (inc len)))
+                :let [y (/ idx len)
+                      y (if to-float (float y) y)]]
+            [r y]))))
 
 (defn- cdf->probability
   [kys vls x]
@@ -171,4 +170,9 @@
   ([alpha]
    (paretomean alpha 1)))
 
+
+(defn weibullvariate
+  [lambda beta]
+  (* lambda (Math/pow (* -1.0 (Math/log (- 1.0 (rand))))
+                      (/ 1.0 beta))))
 

@@ -11,6 +11,16 @@
       (= (for [i (range 1 101)] (d/percentile (range 1 101) i))
          (for [i (range 1 101)] (d/percentile-w (range 1 101) i))) => true)
 
+(facts :cdf
+       (let [cdf (d/cdf (range 1 6))]
+         (get cdf 0) => nil
+         (get cdf 1) => 1/5
+         (get cdf 2) => 2/5
+         (get cdf 3) => 3/5
+         (get cdf 4) => 4/5
+         (get cdf 5) => 1
+         (get cdf 6) => nil))
+
 (facts :cddf
       (let [cdf (d/cdff (range 1 6))]
         (cdf 0) => 0

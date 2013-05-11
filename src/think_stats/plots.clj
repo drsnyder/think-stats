@@ -46,10 +46,9 @@
   [x-vals y-vals &{:keys [r-script csv-out to-plot title] 
                    :or {r-script "plots/line.R" csv-out "plots/line.csv" 
                         to-plot "plots/line.png" title "line"}}]
-  (let [header (list (list "x" "y"))
-        data   (for [i (range 0 (count x-vals))] 
-                 (list (nth x-vals i nil) (nth y-vals i nil)))
-        csv    (concat header data)]
+  (let [header ["x" "y"]
+        data   (map vector x-vals y-vals)
+        csv    (conj data header)]
     (util/write-to-csv csv-out csv)
     (util/shell-exec (format "Rscript %s %s %s %s" r-script csv-out title to-plot))))
 

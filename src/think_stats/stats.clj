@@ -60,11 +60,13 @@
 
 
 (defn pmf
-  [s]
+  [s &{:keys [to-float] :or {to-float true}}]
   (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
   (let [n (count s)]
-    (into {} (for [[k v] (frequencies s)]
-               [k (/ v n)]))))
+    (into {} (for [[k v] (frequencies s)
+                   :let [m (/ k n)
+                         m (if to-float (float m) m)]]
+               [k m]))))
 
 (defn pmf-entry->value
   [e]
