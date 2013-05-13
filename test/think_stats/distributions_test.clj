@@ -71,3 +71,12 @@
              (h/approxiately-equal median (d/paretomedian alpha x-min) 0.05)
              (h/approxiately-equal mean (d/paretomean alpha x-min) 0.05)) => true)))
 
+(facts :normal :slow
+       (let [mu 5.0
+             sigma 1.0
+             threshold 0.01
+             sample (repeatedly 1000000 (fn [] (d/normalvariate mu sigma)))
+             mean (stats/mean sample)
+             stddev (stats/stddev sample)]
+         (h/approxiately-equal mean 5.0) => true
+         (h/approxiately-equal stddev 1.0) => true))

@@ -2,8 +2,10 @@
   (:refer-clojure :exclude [partition])
   (:require (think-stats
               [util :as util]
-              [homeless :as h])))
+              [homeless :as h]))
+  (:import org.apache.commons.math3.special.Erf))
 
+(def ^:private sqrt2 (Math/sqrt 2))
 
 (defn percentile
   "A more efficient percentile that uses a selection algorithm
@@ -189,3 +191,10 @@
   (* lambda (Math/pow (* -1.0 (Math/log (- 1.0 (rand))))
                       (/ 1.0 beta))))
 
+
+(defn normalvariate
+  "Generate random values from a normal distribution with mean mu and standard deviation sigma."
+  [mu sigma]
+  (let [p (rand)
+        x (* sqrt2 (Erf/erfInv (- (* 2 p) 1)))]
+    (+ (* sigma x) mu)))
