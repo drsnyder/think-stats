@@ -1,5 +1,7 @@
 (ns think-stats.stats
-  (:require (think-stats [distributions :as d])))
+  (:require (think-stats
+              [distributions :as d]
+              [homeless :as h])))
 
 (defn sum
   [s]
@@ -13,7 +15,6 @@
     (/ (sum s) 
        (count s))))
 
-(defn square [x] (* x x))
 
 (defn variance
   [s &{:keys [sample] :or {sample false}}]
@@ -22,7 +23,7 @@
             (- (count s) 1) 
             (count s))]
     (when-let [m (mean s)]
-      (/ (sum (map #(square (- % m)) s))
+      (/ (sum (map #(h/square (- % m)) s))
          n))))
 
 (defn stddev
@@ -44,7 +45,7 @@
 (defn hist
   [s]
   (assert (sequential? s) "Cannot compute the hist on a non-seq.")
-  (frequencies s))
+  (into (sorted-map) (for [[k v] (frequencies s)] [k v])))
 
 
 (defn trim
@@ -60,11 +61,11 @@
 
 
 (defn pmf
-  [s &{:keys [to-float] :or {to-float true}}]
+  [s &{:keys [to-float] :or {to-float false}}]
   (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
   (let [n (count s)]
-    (into {} (for [[k v] (frequencies s)
-                   :let [m (/ k n)
+    (into (sorted-map) (for [[k v] (frequencies s)
+                   :let [m (/ v n)
                          m (if to-float (float m) m)]]
                [k m]))))
 
@@ -151,5 +152,10 @@
 
 
 
+(defn z
+  "Compute a z score given a raw score, mean, and standard or sample deviation."
+  [raw mean stddev]
+  (/ (- raw mean)
+     stddev))
 
 

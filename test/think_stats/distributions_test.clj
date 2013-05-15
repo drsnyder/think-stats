@@ -79,4 +79,12 @@
              mean (stats/mean sample)
              stddev (stats/stddev sample)]
          (h/approxiately-equal mean 5.0) => true
+         (h/approxiately-equal stddev 1.0) => true)
+       (let [mu 0
+             sigma 1
+             threshold 0.01
+             sample (repeatedly 1000000 (fn [] (d/normalvariate mu sigma)))
+             mean (stats/mean sample)
+             stddev (stats/stddev sample)]
+         (h/approxiately-equal mean 0.0) => true
          (h/approxiately-equal stddev 1.0) => true))

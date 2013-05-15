@@ -198,3 +198,12 @@
   (let [p (rand)
         x (* sqrt2 (Erf/erfInv (- (* 2 p) 1)))]
     (+ (* sigma x) mu)))
+
+
+(defn normalpdf
+  [mu sigma x]
+  (*
+   (/ 1 (* sigma (Math/sqrt (* 2 Math/PI))))
+   (Math/exp
+     (* -1 (/ (h/square (- x mu))
+              (* 2 (h/square sigma)))))))

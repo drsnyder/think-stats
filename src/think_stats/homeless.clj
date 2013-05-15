@@ -89,5 +89,14 @@
   ([a b]
    (approxiately-equal a b 0.01)))
     
+
+(defn round
+  "Round number to decimals digits."
+  ([number decimals]
+   (let [factor (Math/pow 10 decimals)]
+     (bigdec (/ (Math/round (* factor number)) factor))))
+  ([number]
+   (round number 0)))
         
 
+(defn square [x] (* x x))
