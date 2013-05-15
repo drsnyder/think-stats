@@ -108,7 +108,7 @@
   (let [m (pmf->mean pmf)]
     (sum 
       (map #(* (pmf-entry->freq %)
-              (square (- (pmf-entry->value %) m))) 
+              (h/square (- (pmf-entry->value %) m)))
            pmf))))
 
 
@@ -151,11 +151,17 @@
   (pmf->biased pmf :invert true))
 
 
-
 (defn z
   "Compute a z score given a raw score, mean, and standard or sample deviation."
   [raw mean stddev]
   (/ (- raw mean)
      stddev))
 
+
+(defn z->area
+  "Given a z score, compute the cumulative area under the normal distribution.
+  The standard normal distribution has μ = 0 (mu) and σ = 1 (sigma)."
+  [z]
+  (let [mu 0 sigma 1]
+    (d/normalcdf mu sigma z)))
 

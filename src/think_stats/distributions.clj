@@ -120,7 +120,7 @@
   [(cdf 0.25 :value) (cdf 0.5 :value) (cdf 0.75 :value)])
 
 
-(defn sample
+(defn sample-cdf
   "Generate a lazy seq of values chosen at random from the given cdf. See cdff above.
 
   (def cdf (cdff (take 50 (repeatedly #(rand-int 10)))))
@@ -200,10 +200,8 @@
     (+ (* sigma x) mu)))
 
 
-(defn normalpdf
+(defn normalcdf
   [mu sigma x]
-  (*
-   (/ 1 (* sigma (Math/sqrt (* 2 Math/PI))))
-   (Math/exp
-     (* -1 (/ (h/square (- x mu))
-              (* 2 (h/square sigma)))))))
+  (* 0.5 (+ 1
+            (Erf/erf (/ (- x mu)
+                        (* sigma sqrt2))))))

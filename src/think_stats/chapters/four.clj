@@ -80,3 +80,10 @@
      :features features
      :frequencies freq}))
 
+; The probability that someone has an IQ of 190 (mean = 100 & stddev = 15)
+; is the cumulative area beyond 6 standard deviations under the normal curve.
+; We can compute the area under the normal curve up-to 6 standard deviations so
+; to compute the value we are looking for we subtract it from 1.
+; 0.9999999990134123
+; 6 people
+(def langans (h/round (* 6000000000 (* (- 1 (stats/z->area 6))))))
