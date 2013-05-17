@@ -32,14 +32,18 @@
     (util/write-to-csv csv-out combined)
     (util/shell-exec (format "Rscript %s %s %s" r-script csv-out to-plot))))
 
+(defn get-speeds
+  [&{:keys [file] :or {file "data/speeds.txt"}}]
+  (map #(Float/parseFloat %)
+       (clojure.string/split (slurp file) #"\n")))
+
 
 (defn plot-speeds
   "Plots the speeds for a race relative to the given speed or as the runner running at the given speed would see them."
   ([speed &{:keys [csv-out r-script to-plot] 
             :or {csv-out "plots/3-speeds.csv" r-script "plots/3-speeds.R" 
                  to-plot "plots/3-speeds.png"}}]
-   (let [speeds (map #(Float/parseFloat %) 
-                     (clojure.string/split (slurp "data/speeds.txt") #"\n"))
+   (let [speeds (get-speeds)
          speeds-pmf (h/map-map float (stats/pmf speeds))
          speeds->unbias-by-runner (fn [pmf speed]
                                     (stats/normalize-pmf
@@ -61,8 +65,7 @@
   ([&{:keys [csv-out r-script to-plot] 
       :or {csv-out "plots/3-speeds-cdf.csv" r-script "plots/3-speeds-cdf.R" 
            to-plot "plots/3-speeds-cdf.png"}}]
-   (let [speeds (map #(Float/parseFloat %) 
-                     (clojure.string/split (slurp "data/speeds.txt") #"\n"))
+   (let [speeds (get-speeds)
          speeds-cdf (h/map-map float (d/cdf speeds) :dest (sorted-map))
          speeds-csv (concat (list (list "speed" "cdf(x)")) 
                             (for [k (keys speeds-cdf)] (list k 
@@ -78,7 +81,7 @@
   (let [totalwgts (birth-weight-data data-file)
          cdf-data (d/cdf totalwgts)
          cdf (d/cdff totalwgts)
-         cdf-sample-data (d/cdf (d/sample cdf 1000))
+         cdf-sample-data (d/cdf (d/sample-cdf cdf 1000))
          csv (concat (list (list "weight" "survey" "sample"))
                      (for [k (sort (keys cdf-data)) :when (and 
                                                             (get cdf-data k) 

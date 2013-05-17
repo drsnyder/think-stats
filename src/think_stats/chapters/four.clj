@@ -1,9 +1,12 @@
 (ns think-stats.chapters.four
-  (:require (think-stats [stats :as stats]
-                         [util :as util]
-                         [survey :as s]
-                         [homeless :as h]
-                         [distributions :as d])
+  (:require (think-stats
+              [random :as random]
+              [stats :as stats]
+              [util :as util]
+              [survey :as s]
+              [homeless :as h]
+              [plots :as plots]
+              [distributions :as d])
             [clj-http.client :as client]))
 
 ; TODO: confirm that this has the slope and intesect that we expect
@@ -84,6 +87,16 @@
 ; is the cumulative area beyond 6 standard deviations under the normal curve.
 ; We can compute the area under the normal curve up-to 6 standard deviations so
 ; to compute the value we are looking for we subtract it from 1.
-; 0.9999999990134123
-; 6 people
+;
+; p = 0.9999999990134123
+; 6B * p = 6 people
 (def langans (h/round (* 6000000000 (* (- 1 (stats/z->area 6))))))
+
+
+(defn running-speeds-normal-probability-plot
+  "Generates the normal probability plot for the running speeds from chapter three.
+  (running-speeds-normal-probability-plot (three/get-speeds))"
+  [speeds]
+  (let [speeds (sort speeds)
+        speed-sample (sort (repeatedly (count speeds) random/standard-normalvariate))]
+    (plots/line speed-sample speeds)))

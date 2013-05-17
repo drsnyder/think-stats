@@ -1,11 +1,11 @@
 (ns think-stats.distributions
   (:refer-clojure :exclude [partition])
   (:require (think-stats
+              [constants :as c]
               [util :as util]
               [homeless :as h]))
   (:import org.apache.commons.math3.special.Erf))
 
-(def ^:private sqrt2 (Math/sqrt 2))
 
 (defn percentile
   "A more efficient percentile that uses a selection algorithm
@@ -131,7 +131,8 @@
     (cdf (rand) :value)))
 
 
-; TODO: testing. how?
+
+; TODO: move to random
 (defn expovariate
   "See http://en.wikipedia.org/wiki/Exponential_distribution generating exponential variates"
   [lambda]
@@ -192,16 +193,9 @@
                       (/ 1.0 beta))))
 
 
-(defn normalvariate
-  "Generate random values from a normal distribution with mean mu and standard deviation sigma."
-  [mu sigma]
-  (let [p (rand)
-        x (* sqrt2 (Erf/erfInv (- (* 2 p) 1)))]
-    (+ (* sigma x) mu)))
-
-
 (defn normalcdf
+  "CDF for the normal distribution."
   [mu sigma x]
   (* 0.5 (+ 1
             (Erf/erf (/ (- x mu)
-                        (* sigma sqrt2))))))
+                        (* sigma c/sqrt2))))))

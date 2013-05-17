@@ -2,7 +2,6 @@
   (:use [midje.sweet])
   (:require (think-stats [stats :as stats]
                          [homeless :as h]
-
                          [distributions :as d])))
 
 (facts :percentile
@@ -36,6 +35,7 @@
         (cdf 10) => 1/10
         (cdf 0.1 :value) => 10))
 
+; TODO: move to random
 (facts :exponential
        (let [lambda 2
              sample (repeatedly 100000 (fn [] (d/expovariate lambda)))
@@ -70,21 +70,3 @@
            (and
              (h/approxiately-equal median (d/paretomedian alpha x-min) 0.05)
              (h/approxiately-equal mean (d/paretomean alpha x-min) 0.05)) => true)))
-
-(facts :normal :slow
-       (let [mu 5.0
-             sigma 1.0
-             threshold 0.01
-             sample (repeatedly 1000000 (fn [] (d/normalvariate mu sigma)))
-             mean (stats/mean sample)
-             stddev (stats/stddev sample)]
-         (h/approxiately-equal mean 5.0) => true
-         (h/approxiately-equal stddev 1.0) => true)
-       (let [mu 0
-             sigma 1
-             threshold 0.01
-             sample (repeatedly 1000000 (fn [] (d/normalvariate mu sigma)))
-             mean (stats/mean sample)
-             stddev (stats/stddev sample)]
-         (h/approxiately-equal mean 0.0) => true
-         (h/approxiately-equal stddev 1.0) => true))
