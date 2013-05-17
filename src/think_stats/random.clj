@@ -6,10 +6,17 @@
 
 (def rankit-items 6)
 
+(defn rankit-sample
+  ([cdf]
+   (repeatedly rankit-items cdf))
+  ([]
+   (rankit-sample (fn [] (d/normalvariate 0 1)))))
+
 (defn rankit-samples
   ([cdf n]
-   (repeatedly rankit-items 
-     #(repeatedly n cdf)))
+   (apply map list
+          (map sort
+               (repeatedly n #(rankit-sample cdf)))))
   ([n]
    (rankit-samples (fn [] (d/normalvariate 0 1)) n)))
 
