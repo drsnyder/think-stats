@@ -39,9 +39,9 @@
 
 (defn percentile-w
   "Wikipedia implementation http://en.wikipedia.org/wiki/Percentile"
-  [s x]
+  [s x &{:keys [sorted] :or {sorted false}}]
   (assert (sequential? s) "Cannot compute the percentile on a non-seq data set.")
-  (let [s (sort s)
+  (let [s (if sorted s (sort s))
         len (count s)
         x (max 0 (min x 100))
         c (+ (* (/ x 100) len) 0.5)

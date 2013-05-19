@@ -33,13 +33,14 @@
 
 (defn summary
   [s]
-  {:min (apply min s)
-   :25th (d/percentile s 25)
-   :median (d/percentile s 50)
-   :mean (mean s)
-   :75th (d/percentile s 75)
-   :95th (d/percentile s 95)
-   :max (apply max s)})
+  (let [s (sort s)]
+    {:min (first s)
+     :25th (d/percentile-w s 25 :sorted true)
+     :median (d/percentile-w s 50 :sorted true)
+     :mean (mean s)
+     :75th (d/percentile-w s 75 :sorted true)
+     :95th (d/percentile-w s 95 :sorted true)
+     :max (last s)}))
 
 
 (defn hist
