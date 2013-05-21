@@ -132,20 +132,6 @@
 
 
 
-; TODO: move to random
-(defn expovariate
-  "See http://en.wikipedia.org/wiki/Exponential_distribution generating exponential variates"
-  [lambda]
-  (* -1.0 (/ (Math/log (- 1.0 (rand))) (float lambda))))
-
-(defn expomedian
-  [lambda]
-  (/ (Math/log 2) lambda))
-
-(defn expomean
-  [lambda]
-  (/ 1.0 lambda))
-
 
 
 (defn paretovariate

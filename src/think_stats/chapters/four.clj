@@ -39,7 +39,7 @@
   [n lambda x-min x-max step]
   (let [r-script "plots/exponential.R"
         csv-out "plots/exponential.csv"
-        e (repeatedly n (fn [] (d/expovariate lambda)))
+        e (repeatedly n (fn [] (random/expovariate lambda)))
         cdf (d/cdff e :to-float true)
         xs (range x-min x-max step)
         ys (map cdf xs)

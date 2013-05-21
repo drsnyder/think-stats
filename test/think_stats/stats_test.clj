@@ -24,7 +24,10 @@
 
 (facts :trim 
        (stats/trim (range 1 11) 0.1) => '(2 3 4 5 6 7 8 9)
-       (stats/trim (range 1 11) 0.5) => '())
+       (stats/trim (range 1 11) 0.5) => '()
+       (stats/trim (range 1 101) 0.02) => (range 3 99)
+       (stats/trim (range 1 101) 0.02 :left false) => (range 1 99)
+       (stats/trim (range 1 101) 0.02 :right false) => (range 3 101))
 
 (facts :lifetime
        ((stats/pmf->remaining-lifetime (stats/pmf [0 1 1 2 2])) 2) => 2/5

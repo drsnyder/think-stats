@@ -35,14 +35,6 @@
         (cdf 10) => 1/10
         (cdf 0.1 :value) => 10))
 
-; TODO: move to random
-(facts :exponential
-       (let [lambda 2
-             sample (repeatedly 100000 (fn [] (d/expovariate lambda)))
-             median (d/percentile sample 50)
-             mean (stats/mean sample)]
-         (h/approxiately-equal median (d/expomedian lambda)) => true
-         (h/approxiately-equal mean (d/expomean lambda)) => true))
 
 
 (facts :pareto :slow

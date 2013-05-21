@@ -10,7 +10,7 @@
 
   Example using the exponential distribution using lambda = 1:
 
-  (def e (take 1000 (repeatedly #(d/expovariate 1))))
+  (def e (take 1000 (repeatedly #(random/expovariate 1))))
   (def cdf (d/cdff e :to-float true))
   (plots/line cdf (range 0 2.5 0.01)) ; exponential distribution 
 

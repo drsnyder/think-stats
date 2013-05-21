@@ -2,6 +2,7 @@
   (:use [midje.sweet])
   (:require (think-stats 
               [constants :as c]
+              [distributions :as d]
               [stats :as stats]
               [homeless :as h]
               [random :as random])))
@@ -31,3 +32,10 @@
                     (map vector (random/rankit-samples 1000) 
                          c/standard-normal-order-statistics))) => true)
 
+(facts :exponential
+       (let [lambda 2
+             sample (repeatedly 100000 (fn [] (random/expovariate lambda)))
+             median (d/percentile sample 50)
+             mean (stats/mean sample)]
+         (h/approxiately-equal median (random/expomedian lambda)) => true
+         (h/approxiately-equal mean (random/expomean lambda)) => true))

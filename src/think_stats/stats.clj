@@ -50,13 +50,20 @@
 
 
 (defn trim
-  "Trim's s by taking p % elements from both ends. The sequence is sorted before being trimmed."
-  ([s p]
+  "Trim's s by taking p % elements from both ends. The sequence is sorted before being trimmed.
+  The params :right and :left can be toggled with booleans to selectively trim either side of the data set.
+
+  (trim data 0.02) ; => trims 2% from both sides
+  (trim data 0.02 :left false) ; => only trims 2% from the right
+  "
+  ([s p &{:keys [right left] :or {right true left true}}]
    (assert (sequential? s) "Cannot trim a non-seq.")
    (let [s (sort s)
          len (count s)
          n (int (* p len))]
-     (drop n (take (- len n) s))))
+     (cond->> s
+              right (take (- len n))
+              left  (drop n))))
   ([s]
    (trim s 0.01)))
 
