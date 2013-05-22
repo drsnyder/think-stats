@@ -7,10 +7,13 @@
 # 
 # The data should be sorted and trimmed before written to the input file.
 # Example:
+# (def header ["x" "y"])
 # (def data 
 #   (map vector 
 #       (stats/trim (random/sample (count population) (partial random/expovariate 0.001762)) 0.03 :left false) 
 #       (stats/trim epic 0.03 :left false)))
+# (util/write-to-csv "tmp-qq.csv" (conj data header))
+# Rscript is-distribution-qq.R tmp-qq.csv
 #
 # Refereces:
 # http://en.wikipedia.org/wiki/Q%E2%80%93Q_plot

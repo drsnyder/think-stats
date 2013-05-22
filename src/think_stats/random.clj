@@ -4,7 +4,8 @@
               [constants :as c]
               [homeless :as h]
               [stats :as stats]))
-  (:import org.apache.commons.math3.special.Erf))
+  (:import org.apache.commons.math3.special.Erf
+           org.apache.commons.math3.distribution.GammaDistribution))
 
 (declare normalvariate)
 
@@ -62,4 +63,11 @@
   "Compute the mean of an exponential distribution with a given rate parameter lambda."
   [lambda]
   (/ 1.0 lambda))
+
+
+(defn create-gammavariate
+  [shape scale]
+  (fn []
+    (let [g (GammaDistribution. shape scale)]
+      (.sample g))))
 
