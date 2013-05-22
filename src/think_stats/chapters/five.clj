@@ -31,27 +31,44 @@
     (= (second remaining) :car) :car
     :else :goat))
 
-(defn monty-hall-trial
-  "Runs a single trial of the Monty Hall problem."
-  [sim-map stay?]
-  (let [doors (create-doors)
-        user-door (select-door doors number-doors)
-        user-prize (nth doors user-door)
-        other-door (montys-pick-leaves (remove-door user-door doors))]
+(defn make-selections
+  "Make the selections.
+  (make-selections doors)      ; picks a random door
+  (make-selections doors user-selected-door) ; uses door
+  "
+  ([doors user-selected-door]
+   (let [user-prize (nth doors user-selected-door)
+         other-door (montys-pick-leaves (remove-door user-selected-door doors))]
+     [user-prize other-door]))
+  ([doors]
+   (make-selections doors (select-door doors number-doors))))
+
+
+(defn update-sim-map
+  "Update the sim-map based on the selections made by the user and Monty and whether the
+  user decided to stay or switch."
+  [sim-map selections stay?]
+  (let [[user-prize other-door] selections]
     (cond-> (update-in sim-map [:trial] inc)
             (and stay? (= user-prize :car)) (update-in [:wins] inc)
             (and (not stay?) (= other-door :car)) (update-in [:wins] inc))))
+
+
+(defn monty-hall-trial
+  "Runs a single trial of the Monty Hall problem."
+  [sim-map doors stay?]
+  (update-sim-map sim-map (make-selections doors) stay?))
+
 
 (defn simulate-monty-hall
   "Simulates the Monty Hall problem out to the given horizon using the strategy specified by stay?."
   [horizon stay?]
   (let [final (last 
                 (take horizon 
-                      (iterate #(monty-hall-trial % stay?) starting-sim-map)))
+                      (iterate (fn [sim-map]
+                                 (monty-hall-trial sim-map (create-doors) stay?)) starting-sim-map)))
         wins (:wins final)
         trials (:trial final)]
    {:trials trials
     :wins wins
     :win-rate (float (/ wins horizon))}))
-
-
