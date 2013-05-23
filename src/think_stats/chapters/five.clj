@@ -1,4 +1,6 @@
-(ns think-stats.chapters.five)
+(ns think-stats.chapters.five
+  (:require (think-stats
+              [random :as random])))
 
 (def number-doors 3)
 
@@ -63,10 +65,15 @@
 (defn simulate-monty-hall
   "Simulates the Monty Hall problem out to the given horizon using the strategy specified by stay?."
   [horizon stay?]
-  (let [final (last 
-                (take horizon 
-                      (iterate (fn [sim-map]
-                                 (monty-hall-trial sim-map (create-doors) stay?)) starting-sim-map)))
+  (take horizon
+        (iterate (fn [sim-map]
+                   (monty-hall-trial sim-map (create-doors) stay?)) starting-sim-map)))
+
+
+(defn summarize-monty-hall-simulation
+  "Summarize a Monty Hall simulation."
+  [horizon stay?]
+  (let [final (last (simulate-monty-hall horizon stay?))
         wins (:wins final)
         trials (:trial final)]
    {:trials trials
