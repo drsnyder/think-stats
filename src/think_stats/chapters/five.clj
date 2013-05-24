@@ -79,3 +79,21 @@
    {:trials trials
     :wins wins
     :win-rate (float (/ wins horizon))}))
+
+
+
+; Questions:
+; 5.3
+; 1: (p/independent-and 1/2 1/2) => 1/4
+; 2: (p/dependent-and 1/2 1/2)   => 1/2
+; 3: (p/dependent-and 1/2 1/2)   => 1/2
+; 4: (p/dependent-and 1/2 1/2)   => 1/2
+
+
+(defn baker-trial
+  [mean stddev n sims]
+  (repeatedly sims
+              (fn []
+                (apply max
+                       (repeatedly n
+                                   #(random/normalvariate mean stddev))))))
