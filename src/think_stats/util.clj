@@ -1,8 +1,7 @@
 (ns think-stats.util
   (:require [clojure.java.io  :as io]
             [clojure.java.shell :as shell]
-            [clojure.data.csv :as csv]
-            [lonocloud.synthread :as ->]))
+            [clojure.data.csv :as csv]))
 
 (defn str-to-int
   [s]
@@ -27,15 +26,19 @@
     [cmd]
     (apply shell/sh (split-cmd cmd)))
 
+(defn lazy-reader
+  "Lazily read from fd."
+  [fd]
+  (lazy-seq
+    (if-let [line (.readLine fd)]
+      (cons line (lazy-reader fd))
+      (.close fd))))
 
 (defn read-file
   [file &{:keys [gunzip] :or {gunzip false}}]
-  (with-open [in (-> (io/input-stream file)
-                 (->/when gunzip
-                   (java.util.zip.GZIPInputStream.))
-                 (io/reader))]
-    (doall 
-      (line-seq in))))
+  (lazy-reader (cond-> (io/input-stream file)
+                         gunzip (java.util.zip.GZIPInputStream.)
+                         true (io/reader))))
 
 (defn write-to-csv 
   "Write the simulation data to the given file."
@@ -43,6 +46,3 @@
   (let [writer (if opts (apply io/writer file opts) (io/writer file))]
   (with-open [out-file writer] 
     (csv/write-csv out-file data))))
-
-
-

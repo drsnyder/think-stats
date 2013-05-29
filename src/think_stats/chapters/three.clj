@@ -3,6 +3,7 @@
                          [util :as util]
                          [survey :as s]
                          [homeless :as h]
+                         [pregnancy :as p]
                          [distributions :as d])))
 
 
@@ -94,7 +95,7 @@
 (defn birth-weight-data
   [data-file]
   (let [preg-data (util/read-file data-file :gunzip true)
-        db (map (partial s/line->fields s/fields) preg-data)
+        db (map (partial s/line->fields p/fields) preg-data)
         predicate (fn [r] 
                     (when-let [len (get r "prglength")]
                       (and 
@@ -113,32 +114,3 @@
         totalwgts (for [r all :when (not= (get r "totalwgt_oz") "NA")] 
                     (get r "totalwgt_oz"))]
     totalwgts))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

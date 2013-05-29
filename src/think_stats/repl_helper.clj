@@ -8,6 +8,7 @@
               [distributions :as d]
               [random :as random]
               [pregnancy :as preg]
+              [brfss :as brfss]
               [stats :as stats]
               [plots :as plots])
             (think-stats.chapters [three :as three]

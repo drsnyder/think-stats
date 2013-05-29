@@ -3,6 +3,7 @@
               [distributions :as d]
               [constants :as c]
               [homeless :as h]
+              [util :as util]
               [stats :as stats]))
   (:import org.apache.commons.math3.special.Erf
            org.apache.commons.math3.distribution.GammaDistribution))
@@ -65,9 +66,19 @@
   (/ 1.0 lambda))
 
 
-(defn create-gammavariate
+(defn create-gamma
+  "Create a gamma distribution object. Uses org.apache.commons.math3.distribution.GammaDistribution for generating
+  random variates."
   [shape scale]
-  (fn []
-    (let [g (GammaDistribution. shape scale)]
-      (.sample g))))
+  (GammaDistribution. shape scale))
 
+(def gamma (memoize create-gamma))
+
+(defn sample-gamma
+  [g]
+  (.sample g))
+
+(defn gammavariate
+  "Generate random values from a gamma distribution with the given shape and scale."
+  [shape scale]
+  (sample-gamma (gamma shape scale)))

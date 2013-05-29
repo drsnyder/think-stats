@@ -34,6 +34,6 @@ plot(model)
 ggplot(aes(x=x, y=y), data=df) + 
     geom_line(color="blue") +
     geom_smooth(method="lm", color="red", size=0.3) + 
-    labs(y="E Data Set", x="expovariate", title="Q-Q Plot x=Exponential, y=E Data Set")
+    labs(y="E Data Set", x="random variate", title="Q-Q Plot x=Random Variate, y=E Data Set")
 ggsave("plots/is-distribution-qq.png")
 

@@ -7,7 +7,6 @@
   :profiles {:dev {:plugins [[lein-midje "3.0.0"]]
                    :dependencies []}}
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [lonocloud/synthread "1.0.3"]
                  [org.apache.commons/commons-math3 "3.2"]
                  [org.clojure/data.csv "0.1.2"]
                  [midje "1.5.0"]
