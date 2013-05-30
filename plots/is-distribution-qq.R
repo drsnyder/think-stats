@@ -31,9 +31,10 @@ summary(model)
 plot(model)
 
 # the two data sets and the linear model. does it fit?
-ggplot(aes(x=x, y=y), data=df) + 
-    geom_line(color="blue") +
-    geom_smooth(method="lm", color="red", size=0.3) + 
+ggplot(data=df) +
+    geom_line(aes(x=x, y=y), color="blue") +
+    geom_line(aes(x=x, y=x), color="red", size=0.3) +
+#    geom_smooth(method="lm", color="red", size=0.3) +
     labs(y="E Data Set", x="random variate", title="Q-Q Plot x=Random Variate, y=E Data Set")
 ggsave("plots/is-distribution-qq.png")
 

@@ -31,13 +31,15 @@
   (Math/sqrt (variance s)))
 
 
+(declare trim)
+
 (defn summary
   [s &{:keys [trim? p] :or {trim? false p 0.01}}]
   (let [s (if trim? (trim s p) (sort s))]
     {:min (first s)
      :25th (d/percentile-w s 25 :sorted true)
      :median (d/percentile-w s 50 :sorted true)
-     :mean (mean s)
+     :mean (float (mean s))
      :stddev (stddev s)
      :75th (d/percentile-w s 75 :sorted true)
      :95th (d/percentile-w s 95 :sorted true)
