@@ -26,9 +26,9 @@ args <- commandArgs(TRUE)
 df <- read.csv(args[1], header=TRUE)
 
 # if this is exponential, get the slope and the x intercept
-model <- lm(y~x, data=df)
-summary(model)
-plot(model)
+# model <- lm(y~x, data=df)
+# summary(model)
+# plot(model)
 
 # the two data sets and the linear model. does it fit?
 ggplot(data=df) +

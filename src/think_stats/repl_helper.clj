@@ -14,5 +14,6 @@
             (think-stats.chapters [three :as three]
                                   [four :as four])
             [clj-http.client :as client]
+            [clojure.pprint :refer [pprint]]
             [midje.repl :refer :all]))
 

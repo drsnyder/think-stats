@@ -6,6 +6,7 @@
               [survey :as s]
               [homeless :as h]
               [plots :as plots]
+              [brfss :as brfss]
               [distributions :as d])
             [clj-http.client :as client]))
 
@@ -100,3 +101,25 @@
   (let [speeds (sort speeds)
         speed-sample (sort (repeatedly (count speeds) random/standard-normalvariate))]
     (plots/line speed-sample speeds)))
+
+(defn brfss-4.11-gen-data
+  [file]
+  (let [data (brfss/load-data file)
+        weights (map #(get % "weight2") data)
+        ; we end up sorting twice here
+        summary (stats/summary weights :trim? true)
+        normal-sample (random/sample (count weights)
+                                 #(random/normalvariate (:mean summary) (:stddev summary)))
+        xy (map vector
+                (stats/trim normal-sample)
+                (stats/trim weights))
+
+        logweights (map #(Math/log %) weights)
+        summary (stats/summary logweights :trim? true)
+        normal-sample (random/sample (count logweights)
+                                 #(random/normalvariate (:mean summary) (:stddev summary)))
+        xlogy (map vector
+                   (stats/trim normal-sample)
+                   (stats/trim logweights))]
+        (util/write-to-csv "tmp/weights.csv" (conj xy ["x" "y"]))
+        (util/write-to-csv "tmp/weights-log.csv" (conj xlogy ["x" "y"]))))
