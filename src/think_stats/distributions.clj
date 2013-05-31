@@ -132,17 +132,15 @@
 
 
 
-
-
 (defn paretovariate
   "See http://en.wikipedia.org/wiki/Pareto_distribution for random sample generation."
   ([alpha x-min]
-   (* x-min 
-     (/ 1.0 (Math/pow (- 1.0 (rand)) 
+   (* x-min
+     (/ 1.0 (Math/pow (- 1.0 (rand))
                       (/ 1 alpha)))))
-  ([alpha] 
+  ([alpha]
    (paretovariate alpha 1)))
-      
+
 (defn paretomedian
   "Compute the median of a Pareto distribution with the given alpha and threshold."
   ([alpha x-min]
