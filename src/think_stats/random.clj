@@ -46,6 +46,11 @@
         x (* c/sqrt2 (Erf/erfInv (- (* 2 p) 1)))]
     (+ (* sigma x) mu)))
 
+(defn lognormalvariate
+  "Log normal distribution."
+  [mu sigma]
+  (Math/exp (normalvariate mu sigma)))
+
 
 (defn expovariate
   "Generate random values from an exponential distribution with rate parameter lambda.

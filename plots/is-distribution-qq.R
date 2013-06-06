@@ -10,7 +10,7 @@
 # (def header ["x" "y"])
 # (def data
 #   (map vector
-#       (statstrim (random/sample (count population) (partial random/expovariate 0.001762)) 0.03 :left false)
+#       (stats/trim (random/sample (count population) (partial random/expovariate 0.001762)) 0.03 :left false)
 #       (stats/trim epic 0.03 :left false)))
 # (util/write-to-csv "tmp-qq.csv" (conj data header))
 # Rscript is-distribution-qq.R tmp-qq.csv

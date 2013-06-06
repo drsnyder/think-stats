@@ -1,5 +1,7 @@
 (ns think-stats.chapters.five
   (:require (think-stats
+              [stats :as stats]
+              [util :as util]
               [random :as random])))
 
 (def number-doors 3)
@@ -97,3 +99,21 @@
                 (apply max
                        (repeatedly n
                                    #(random/normalvariate mean stddev))))))
+
+(defn compare-baker-and-poincare
+  [out-file mean stddev n sims]
+  (let [bakery (map int (repeatedly sims #(random/normalvariate mean stddev)))
+        bpmf (stats/pmf bakery)
+        p-loafs (map int (baker-trial mean stddev n sims))
+        ppmf (stats/pmf p-loafs)]
+    (util/write-to-csv out-file (conj
+                               (map vector
+                                    (keys bpmf)
+                                    (vals bpmf)
+                                    (keys ppmf)
+                                    (vals ppmf))
+                               ["bweights" "bfreq" "pweights" "pfreq"]))
+    [(stats/summary bakery) (stats/summary p-loafs)]))
+
+
+

@@ -57,7 +57,7 @@
     (count s)))
 
 (defn cdf
-  [s &{:keys [to-float] :or {to-float false}}]
+  [s &{:keys [to-float] :or {to-float true}}]
   (assert (sequential? s) "Cannot compute the cdf on a non-seq data set.")
   (let [s (sort s)
         len (count s)]

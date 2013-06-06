@@ -27,8 +27,8 @@
          n))))
 
 (defn stddev
-  [s]
-  (Math/sqrt (variance s)))
+  [s &{:keys [sample] :or {sample false}}]
+  (Math/sqrt (variance s :sample sample)))
 
 
 (declare trim)
@@ -40,7 +40,7 @@
      :25th (d/percentile-w s 25 :sorted true)
      :median (d/percentile-w s 50 :sorted true)
      :mean (float (mean s))
-     :stddev (stddev s)
+     :stddev (stddev s :sample true)
      :75th (d/percentile-w s 75 :sorted true)
      :95th (d/percentile-w s 95 :sorted true)
      :max (last s)
@@ -73,7 +73,7 @@
 
 
 (defn pmf
-  [s &{:keys [to-float] :or {to-float false}}]
+  [s &{:keys [to-float] :or {to-float true}}]
   (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
   (let [n (count s)]
     (into (sorted-map) (for [[k v] (frequencies s)
@@ -164,7 +164,10 @@
 
 
 (defn z
-  "Compute a z score given a raw score, mean, and standard or sample deviation."
+  "Compute a z score given a raw score, mean, and standard or sample deviation.
+  raw: raw score
+  mean: sample mean
+  stddev: sample standard deviation"
   [raw mean stddev]
   (/ (- raw mean)
      stddev))
@@ -173,7 +176,13 @@
 (defn z->area
   "Given a z score, compute the cumulative area under the normal distribution.
   The standard normal distribution has μ = 0 (mu) and σ = 1 (sigma)."
-  [z]
+  [z-score]
   (let [mu 0 sigma 1]
-    (d/normalcdf mu sigma z)))
+    (d/normalcdf mu sigma z-score)))
+
+(defn p-value
+  "Compute the p value for a give z score. The p value is the probability of
+  getting a given statistic by chance."
+  [z-score]
+  (- 1 (z->area (Math/abs z-score))))
 
