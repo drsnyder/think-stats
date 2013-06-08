@@ -201,9 +201,14 @@
 (def t-distribution (memoize create-t))
 
 (defn t->p-value
-  "http://www.wolframalpha.com/input/?i=pdf[+studenttdistribution[29]%2C+0.015+]
-  Compute the p-value for a given degrees of freedom and a t-value. This should be equivalent
-  to a table of critical values in the t distributions."
+  "Compute the p-value for a given degrees of freedom and a t-value. This should be equivalent
+  to a table of critical values in the t distributions.
+  
+  .density gives the PDF(x) for the t distribution.
+
+  References:
+http://www.wolframalpha.com/input/?i=pdf[+studenttdistribution[29]%2C+0.015+]
+  http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/TDistribution.html"
   [dof t-value &{:keys [one-sided] :or {one-sided false}}]
   (let [a (.density (t-distribution dof) t-value)]
     (if one-sided
