@@ -1,7 +1,8 @@
 (ns think-stats.stats
   (:require (think-stats
               [distributions :as d]
-              [homeless :as h])))
+              [homeless :as h]))
+  (:import org.apache.commons.math3.distribution.TDistribution))
 
 (defn sum
   [s]
@@ -186,3 +187,23 @@
   [z-score]
   (- 1 (z->area (Math/abs z-score))))
 
+(defn standard-error
+  "Compute the standard error of a sample statistic."
+  [stddev sample-size]
+  (/ stddev (Math/sqrt sample-size)))
+
+
+(defn create-t
+  "Create a t-distribution object. Uses org.apache.commons.math3.distribution.TDistribution."
+  [dof]
+  (TDistribution. dof))
+
+(def t-distribution (memoize create-t))
+
+(defn t->p-value
+  "http://www.wolframalpha.com/input/?i=inversecdf[+studenttdistribution[29]%2C+0.015+]"
+  [dof t-value &{:keys [one-sided] :or {one-sided false}}]
+  (let [a (.density (t-distribution dof) t-value)]
+    (if one-sided
+      (/ a 2)
+      a)))
