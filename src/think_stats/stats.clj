@@ -187,23 +187,26 @@
   [z-score]
   (- 1 (z->area (Math/abs z-score))))
 
+(def z->p-value p-value)
+
 (defn standard-error
   "Compute the standard error of a sample statistic."
   [stddev sample-size]
   (/ stddev (Math/sqrt sample-size)))
 
 
-(defn create-t
+; TODO: move to random
+(defn- create-t-dist
   "Create a t-distribution object. Uses org.apache.commons.math3.distribution.TDistribution."
   [dof]
   (TDistribution. dof))
 
-(def t-distribution (memoize create-t))
+(def ^:private t-distribution (memoize create-t-dist))
 
 (defn t->p-value
   "Compute the p-value for a given degrees of freedom and a t-value. This should be equivalent
   to a table of critical values in the t distributions.
-  
+
   .density gives the PDF(x) for the t distribution.
 
   References:
@@ -214,3 +217,19 @@ http://www.wolframalpha.com/input/?i=pdf[+studenttdistribution[29]%2C+0.015+]
     (if one-sided
       (/ a 2)
       a)))
+
+
+(defn alpha->t
+  "Compute the t value for a given alpha level degrees of freedom.
+   Example:
+   Compute the t value for for a two-tailed test with 120 degrees of freedom and an alpha level of 0.05:
+
+   (alpha->t 120 0.05)
+
+   For a one-tailed test use:
+
+   (alpha->t 120 0.05 :two-tailed false)
+  "
+  [dof alpha &{:keys [two-tailed] :or {two-tailed true}}]
+  (let [p (if two-tailed (/ alpha 2.0) alpha)]
+    (.inverseCumulativeProbability (t-distribution dof) p)))
