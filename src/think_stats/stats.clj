@@ -1,8 +1,8 @@
 (ns think-stats.stats
   (:require (think-stats
               [distributions :as d]
-              [homeless :as h]))
-  (:import org.apache.commons.math3.distribution.TDistribution))
+              [homeless :as h]
+              [random :as random])))
 
 (defn sum
   [s]
@@ -74,7 +74,7 @@
 
 
 (defn pmf
-  [s &{:keys [to-float] :or {to-float true}}]
+  [s &{:keys [to-float] :or {to-float false}}]
   (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
   (let [n (count s)]
     (into (sorted-map) (for [[k v] (frequencies s)
@@ -195,14 +195,6 @@
   (/ stddev (Math/sqrt sample-size)))
 
 
-; TODO: move to random
-(defn- create-t-dist
-  "Create a t-distribution object. Uses org.apache.commons.math3.distribution.TDistribution."
-  [dof]
-  (TDistribution. dof))
-
-(def ^:private t-distribution (memoize create-t-dist))
-
 (defn t->p-value
   "Compute the p-value for a given degrees of freedom and a t-value. This should be equivalent
   to a table of critical values in the t distributions.
@@ -210,10 +202,10 @@
   .density gives the PDF(x) for the t distribution.
 
   References:
-http://www.wolframalpha.com/input/?i=pdf[+studenttdistribution[29]%2C+0.015+]
-  http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/TDistribution.html"
+    http://www.wolframalpha.com/input/?i=pdf[+studenttdistribution[29]%2C+0.015+]
+    http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/TDistribution.html"
   [dof t-value &{:keys [one-sided] :or {one-sided false}}]
-  (let [a (.density (t-distribution dof) t-value)]
+  (let [a (.density (random/t-distribution dof) t-value)]
     (if one-sided
       (/ a 2)
       a)))
@@ -228,8 +220,7 @@ http://www.wolframalpha.com/input/?i=pdf[+studenttdistribution[29]%2C+0.015+]
 
    For a one-tailed test use:
 
-   (alpha->t 120 0.05 :two-tailed false)
-  "
+   (alpha->t 120 0.05 :two-tailed false)"
   [dof alpha &{:keys [two-tailed] :or {two-tailed true}}]
   (let [p (if two-tailed (/ alpha 2.0) alpha)]
-    (.inverseCumulativeProbability (t-distribution dof) p)))
+    (Math/abs (.inverseCumulativeProbability (random/t-distribution dof) p))))

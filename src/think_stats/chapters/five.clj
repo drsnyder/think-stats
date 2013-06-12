@@ -1,6 +1,7 @@
 (ns think-stats.chapters.five
   (:require (think-stats
               [stats :as stats]
+              [distributions :as d]
               [util :as util]
               [random :as random])))
 
@@ -101,19 +102,22 @@
                                    #(random/normalvariate mean stddev))))))
 
 (defn compare-baker-and-poincare
-  [out-file mean stddev n sims]
-  (let [bakery (map int (repeatedly sims #(random/normalvariate mean stddev)))
-        bpmf (stats/pmf bakery)
+  "5.6: Compare a sampling of the baker's bread with what he is giving Poincaré."
+  [mean stddev n sims]
+  (let [r-script "plots/bakery.R"
+        csv-out "plots/bakery.csv"
         p-loafs (map int (baker-trial mean stddev n sims))
-        ppmf (stats/pmf p-loafs)]
-    (util/write-to-csv out-file (conj
+        pcdf (d/cdf p-loafs :to-float true)
+        bakery (map int (repeatedly sims #(random/normalvariate (stats/mean p-loafs) (stats/stddev p-loafs))))
+        bcdf (d/cdf bakery :to-float true)]
+    (util/write-to-csv csv-out (conj
                                (map vector
-                                    (keys bpmf)
-                                    (vals bpmf)
-                                    (keys ppmf)
-                                    (vals ppmf))
-                               ["bweights" "bfreq" "pweights" "pfreq"]))
+                                    (keys bcdf)
+                                    (vals bcdf)
+                                    (keys pcdf)
+                                    (vals pcdf))
+                               ["bweights" "Baker" "pweights" "Poincare"]))
+    (let [ret (util/shell-exec (format "Rscript %s %s" r-script csv-out))]
+      (when (not= (:exit ret) 0)
+        (println "Error: " (:err ret))))
     [(stats/summary bakery) (stats/summary p-loafs)]))
-
-
-

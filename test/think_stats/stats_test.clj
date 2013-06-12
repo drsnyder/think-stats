@@ -1,6 +1,7 @@
 (ns think-stats.stats-test
   (:use [midje.sweet])
   (:require (think-stats [stats :as stats]
+                         [homeless :as h]
                          [util :as u])))
 
 (facts :mean
@@ -36,3 +37,10 @@
 
 (facts :binning
        (stats/bin-pmf-freq (stats/pmf [1 1 1 2 2 2 3 3 3]) #{2 3}) => 6/9)
+
+(facts :t
+       (let [alpha 0.5
+             dof   120
+             t (stats/alpha->t dof alpha)
+             alpha' (stats/t->p-value dof t)]
+         (h/approxiately-equal alpha alpha' 0.009)))
