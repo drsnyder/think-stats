@@ -107,6 +107,7 @@
   [mean stddev n sims]
   (let [r-script "plots/bakery.R"
         csv-out "plots/bakery.csv"
+        csv-raw-out "plots/bakery-raw.csv"
         p-loafs (map int (baker-trial mean stddev n sims))
         pcdf (d/cdf p-loafs :to-float true)
         bakery (map int (repeatedly sims #(random/normalvariate (stats/mean p-loafs) (stats/stddev p-loafs))))
@@ -118,10 +119,12 @@
                                     (keys pcdf)
                                     (vals pcdf))
                                ["bweights" "Baker" "pweights" "Poincare"]))
-    (let [ret (util/shell-exec (format "Rscript %s %s" r-script csv-out))]
-      (when (not= (:exit ret) 0)
-        (println "Error: " (:err ret))))
-    [bakery p-loafs]))
+    (util/write-to-csv csv-raw-out (conj (map vector bakery p-loafs) ["baker" "poincare"]))
+    (let [ret (util/shell-exec (format "Rscript %s %s %s" r-script csv-out csv-raw-out))]
+      (if (not= (:exit ret) 0)
+        (println "Error: " (:err ret))
+        (println (:out ret)))
+      [bakery p-loafs])))
 
 
 (defn dance-party
