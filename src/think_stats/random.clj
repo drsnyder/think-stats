@@ -10,8 +10,8 @@
 
 (declare normalvariate)
 
-(def standard-normal-mu 0)
-(def standard-normal-sigma 1)
+(def standard-normal-mu 0)    ; mean
+(def standard-normal-sigma 1) ; standard deviation
 (def standard-normalvariate #(normalvariate standard-normal-mu standard-normal-sigma))
 
 (def rankit-items 6)

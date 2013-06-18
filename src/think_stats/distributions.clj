@@ -178,7 +178,7 @@
 
 
 (defn normalcdf
-  "CDF for the normal distribution."
+  "CDF for the normal distribution. mu is the mean and sigma is the standard deviation."
   [mu sigma x]
   (* 0.5 (+ 1
             (Erf/erf (/ (- x mu)

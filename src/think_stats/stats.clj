@@ -173,6 +173,11 @@
   (/ (- raw mean)
      stddev))
 
+(defn t
+  "Compute the t value given two sample means and a standard error."
+  [raw mean standard-error]
+  (/ (- raw mean)
+     standard-error))
 
 (defn z->area
   "Given a z score, compute the cumulative area under the normal distribution.

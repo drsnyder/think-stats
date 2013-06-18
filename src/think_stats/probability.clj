@@ -23,3 +23,12 @@
   [a b]
   (* b (dependent-and a b)))
 
+(defn stress-strength-prob
+  "Compute the probability that random variable A is less than random variable B (P(A < B)).
+  References:
+  http://stats.stackexchange.com/questions/24693/probability-that-random-variable-b-is-greater-than-random-variable-a
+  http://en.wikipedia.org/wiki/Stress%E2%80%93strength_analysis"
+  [a-mean a-var b-mean b-var]
+  (/ (- b-mean a-mean)
+     (Math/sqrt
+       (+ a-var b-var))))

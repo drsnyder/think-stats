@@ -3,6 +3,7 @@
               [stats :as stats]
               [distributions :as d]
               [util :as util]
+              [probability :as p]
               [random :as random])))
 
 (def number-doors 3)
@@ -120,4 +121,40 @@
     (let [ret (util/shell-exec (format "Rscript %s %s" r-script csv-out))]
       (when (not= (:exit ret) 0)
         (println "Error: " (:err ret))))
-    [(stats/summary bakery) (stats/summary p-loafs)]))
+    [bakery p-loafs]))
+
+
+(defn dance-party
+  "5.7: In the BRFSS (see Section 4.5), the distribution of heights is roughly normal with
+  parameters μ=178cm and σ2=59.4cm for men, and μ=163cm and σ2 = 52.8 cm for women.
+
+  One way to determine this probability is to simulate pairing p partners and count the number of occurences where
+  the height of the woman and greater than the height of the male. For more accuracy we could simulate this n times
+  and take the mean.
+
+  I wanted to confirm this result analytically, but I wasn't sure how. I later found this:
+  http://stats.stackexchange.com/questions/24693/probability-that-random-variable-b-is-greater-than-random-variable-a
+  which confirmed the simulated result.
+  "
+  []
+  (let [horizon 1000
+        sims 100
+        men-mean 178
+        men-var 59.4
+        men-sigma (Math/sqrt men-var)
+        women-mean 163
+        woman-var 52.8
+        women-sigma (Math/sqrt woman-var)
+        sim (repeatedly sims (fn []
+                               (/ (count (filter
+                                           #(> (second %) (first %))
+                                           (map vector
+                                                (random/sample horizon #(random/normalvariate men-mean men-sigma))
+                                                (random/sample horizon #(random/normalvariate women-mean women-sigma)))))
+                                  horizon)))]
+    {:men-mean men-mean
+     :men-sigma men-sigma
+     :women-mean women-mean
+     :women-sigma women-sigma
+     :prob (stats/z->p-value (p/stress-strength-prob men-mean men-var women-mean woman-var))
+     :sim (float (stats/mean sim))}))
