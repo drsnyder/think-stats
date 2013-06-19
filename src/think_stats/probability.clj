@@ -1,4 +1,5 @@
-(ns think-stats.probability)
+(ns think-stats.probability
+  (:require (think-stats [util :as util])))
 
 (defn bernoulli-event
   [p]
@@ -32,3 +33,27 @@
   (/ (- b-mean a-mean)
      (Math/sqrt
        (+ a-var b-var))))
+
+
+(defn n-choose-k
+  "Compute the binomial coefficient \"n choose k\"."
+  [n k]
+  (cond
+    (= k 0) 1
+    (< k 0) 0
+    (< n 0) 0
+    (> k n) 0
+    :else
+    (/ (util/factorial n)
+       (* (util/factorial k)
+         (util/factorial
+           (- n k))))))
+
+(def binomial-coefficient n-choose-k)
+
+(defn binomial-pmf
+  "PMF(k) of the binomial distribution."
+  [n k p]
+  (* (n-choose-k n k)
+    (Math/pow p k)
+    (Math/pow (- 1 p) (- n k))))

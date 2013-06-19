@@ -1,8 +1,8 @@
 (ns think-stats.stats
   (:require (think-stats
               [distributions :as d]
-              [homeless :as h]
-              [random :as random])))
+              [homeless :as h]))
+  (:import org.apache.commons.math3.distribution.TDistribution))
 
 (defn sum
   [s]
@@ -164,6 +164,16 @@
   (pmf->biased pmf :invert true))
 
 
+
+
+(defn create-t-dist
+  "Create a t-distribution object. Uses org.apache.commons.math3.distribution.TDistribution."
+  [dof]
+  (TDistribution. dof))
+
+(def t-distribution (memoize create-t-dist))
+
+
 (defn z
   "Compute a z score given a raw score, mean, and standard or sample deviation.
   raw: raw score
@@ -210,7 +220,7 @@
     http://www.wolframalpha.com/input/?i=pdf[+studenttdistribution[29]%2C+0.015+]
     http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/TDistribution.html"
   [dof t-value &{:keys [one-sided] :or {one-sided false}}]
-  (let [a (.density (random/t-distribution dof) t-value)]
+  (let [a (.density (t-distribution dof) t-value)]
     (if one-sided
       (/ a 2)
       a)))
@@ -228,4 +238,4 @@
    (alpha->t 120 0.05 :two-tailed false)"
   [dof alpha &{:keys [two-tailed] :or {two-tailed true}}]
   (let [p (if two-tailed (/ alpha 2.0) alpha)]
-    (Math/abs (.inverseCumulativeProbability (random/t-distribution dof) p))))
+    (Math/abs (.inverseCumulativeProbability (t-distribution dof) p))))

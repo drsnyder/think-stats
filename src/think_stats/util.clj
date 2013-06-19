@@ -46,3 +46,11 @@
   (let [writer (if opts (apply io/writer file opts) (io/writer file))]
   (with-open [out-file writer] 
     (csv/write-csv out-file data))))
+
+(defn factorial
+  [n]
+  (letfn [(fact [i acc]
+            (if (= i 0)
+              acc
+              (fact (dec i) (* i acc))))]
+    (fact n (bigint 1))))

@@ -3,9 +3,9 @@
               [distributions :as d]
               [constants :as c]
               [homeless :as h]
+              [stats :as stats]
               [util :as util]))
   (:import org.apache.commons.math3.special.Erf
-           org.apache.commons.math3.distribution.TDistribution
            org.apache.commons.math3.distribution.GammaDistribution))
 
 (declare normalvariate)
@@ -87,11 +87,3 @@
   "Generate random values from a gamma distribution with the given shape and scale."
   [shape scale]
   (sample-gamma (gamma shape scale)))
-
-
-(defn create-t-dist
-  "Create a t-distribution object. Uses org.apache.commons.math3.distribution.TDistribution."
-  [dof]
-  (TDistribution. dof))
-
-(def t-distribution (memoize create-t-dist))
