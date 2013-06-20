@@ -2,11 +2,14 @@
   (:require (think-stats [util :as util])))
 
 (defn bernoulli-event
+  "Generates a function than when called generates a 1 with probability p and a 0 with probability
+  1 - p."
   [p]
   (fn []
     (if (<= (rand 1) p)
       1
       0)))
+
 
 (defn independent-and
   "P(A and B) = P(A) P(B)"

@@ -54,3 +54,14 @@
               acc
               (fact (dec i) (* i acc))))]
     (fact n (bigint 1))))
+
+(defn contains-streak?
+  "Returns true if a streak of n consecutive e exists in s falsey otherwise."
+  [s e n]
+  (assert (sequential? s) "Cannot test contains-streak? on a non-seq.")
+  (loop [l s
+         c 0]
+    (cond (= n c) true
+          (empty? l) nil
+          (= (first l) e) (recur (rest l) (inc c))
+          :else (recur (rest l) 0))))
