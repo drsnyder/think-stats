@@ -7,6 +7,7 @@
               [survey :as s]
               [distributions :as d]
               [random :as random]
+              [probability :as p]
               [pregnancy :as preg]
               [brfss :as brfss]
               [stats :as stats]

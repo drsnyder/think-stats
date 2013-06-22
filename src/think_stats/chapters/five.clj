@@ -161,3 +161,13 @@
      :women-sigma women-sigma
      :prob (stats/z->p-value (p/stress-strength-prob men-mean men-var women-mean woman-var))
      :sim (float (stats/mean sim))}))
+
+(defn streak-sim
+  [shots make p trials]
+  (let [event (p/bernoulli-event p)
+        game #(util/contains-streak? (repeatedly shots event) 1 make)
+        sim (repeatedly trials game)
+        streaks (filter true? sim)]
+    (float 
+      (/ (count streaks) 
+         trials))))

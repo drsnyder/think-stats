@@ -18,7 +18,7 @@
 
 (defn dependent-and
   "P(A and B) = P(B) P(A|B). The chance that the first thing happens and then 
-  the second given the first."
+  the second given the first. This evaluates to the probability of B."
   [a b]
   (/ (* a b)
      b))
@@ -60,3 +60,5 @@
   (* (n-choose-k n k)
     (Math/pow p k)
     (Math/pow (- 1 p) (- n k))))
+
+
