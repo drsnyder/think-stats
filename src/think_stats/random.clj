@@ -6,6 +6,7 @@
               [stats :as stats]
               [util :as util]))
   (:import org.apache.commons.math3.special.Erf
+           org.apache.commons.math3.distribution.BinomialDistribution
            org.apache.commons.math3.distribution.GammaDistribution))
 
 (declare normalvariate)
@@ -87,3 +88,15 @@
   "Generate random values from a gamma distribution with the given shape and scale."
   [shape scale]
   (sample-gamma (gamma shape scale)))
+
+(defn create-binomial
+  [trials p]
+   (BinomialDistribution. trials p))
+
+(def binomial (memoize create-binomial))
+
+(defn binomialvariate
+  "Generate random values from a binomial distribution with the given trials and
+  probability p."
+  [trials p]
+  (.inverseCumulativeProbability (binomial trials p) (- 1.0 (rand))))
