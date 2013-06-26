@@ -168,6 +168,6 @@
         game #(util/contains-streak? (repeatedly shots event) 1 make)
         sim (repeatedly trials game)
         streaks (filter true? sim)]
-    (float 
-      (/ (count streaks) 
+    (float
+      (/ (count streaks)
          trials))))

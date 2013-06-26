@@ -60,5 +60,3 @@
   (* (n-choose-k n k)
     (Math/pow p k)
     (Math/pow (- 1 p) (- n k))))
-
-
