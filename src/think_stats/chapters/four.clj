@@ -13,8 +13,8 @@
 ; TODO: confirm that this has the slope and intesect that we expect
 (defn pareto-cdf
   "4.3 Plots the pareto CDF and CCDF. The CCDF is plotted on a log-log scale. See also plots/pareto.R.
-  Example: 
-  (four/pareto-cdf 10000 1 0.5 0 10 0.1) 
+  Example:
+  (four/pareto-cdf 10000 1 0.5 0 10 0.1)
   "
   [n alpha threshold x-min x-max step]
   (let [r-script "plots/pareto.R"

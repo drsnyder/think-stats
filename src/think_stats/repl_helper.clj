@@ -13,7 +13,8 @@
               [stats :as stats]
               [plots :as plots])
             (think-stats.chapters [three :as three]
-                                  [four :as four])
+                                  [four :as four]
+                                  [five :as five])
             [clj-http.client :as client]
             [clojure.pprint :refer [pprint]]
             [midje.repl :refer :all]))

@@ -162,12 +162,14 @@
      :prob (stats/z->p-value (p/stress-strength-prob men-mean men-var women-mean woman-var))
      :sim (float (stats/mean sim))}))
 
+
 (defn streak-sim
-  [shots make p trials]
+  "What is the probability of success events in a given the number of tries and p probability of success."
+  [tries success p simulations]
   (let [event (p/bernoulli-event p)
-        game #(util/contains-streak? (repeatedly shots event) 1 make)
-        sim (repeatedly trials game)
+        game #(util/contains-streak? (repeatedly tries event) 1 success)
+        sim (repeatedly simulations game)
         streaks (filter true? sim)]
-    (float 
-      (/ (count streaks) 
-         trials))))
+    (float
+      (/ (count streaks)
+         simulations))))
