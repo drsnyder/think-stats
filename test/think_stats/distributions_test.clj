@@ -13,26 +13,26 @@
 (facts :cdf
        (let [cdf (d/cdf (range 1 6))]
          (get cdf 0) => nil
-         (get cdf 1) => 1/5
-         (get cdf 2) => 2/5
-         (get cdf 3) => 3/5
-         (get cdf 4) => 4/5
-         (get cdf 5) => 1
+         (get cdf 1) => (float 1/5)
+         (get cdf 2) => (float 2/5)
+         (get cdf 3) => (float 3/5)
+         (get cdf 4) => (float 4/5)
+         (get cdf 5) => (float 1)
          (get cdf 6) => nil))
 
 (facts :cddf
       (let [cdf (d/cdff (range 1 6))]
-        (cdf 0) => 0
-        (cdf 1) => 1/5
-        (cdf 2) => 2/5
-        (cdf 2.5) => 3/5
-        (cdf 3) => 3/5
-        (cdf 4) => 4/5
-        (cdf 5) => 1
-        (cdf 6) => 1)
+        (cdf 0)   => 0
+        (cdf 1)   => (float 1/5)
+        (cdf 2)   => (float 2/5)
+        (cdf 2.5) => (float 3/5)
+        (cdf 3)   => (float 3/5)
+        (cdf 4)   => (float 4/5)
+        (cdf 5)   => (float 1)
+        (cdf 6)   => 1)
 
       (let [cdf (d/cdff (range 1 101))]
-        (cdf 10) => 1/10
+        (cdf 10) => (float 1/10)
         (cdf 0.1 :value) => 10))
 
 

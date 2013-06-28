@@ -27,4 +27,3 @@ ggplot(data=breada) +
     labs(y="Frequency", x="Weight in Grams", title="Poincaré vs the Baker") +
     theme(legend.title=element_blank())
 ggsave("plots/bakery.png")
-

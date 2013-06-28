@@ -158,28 +158,16 @@
    (paretomean alpha 1)))
 
 
-(defn weibullvariate
-  "See http://en.wikipedia.org/wiki/Weibull_distribution.
-
-  A transformation that should produce a straight line:
-  log(-log(y)) = log(x)
-  [ log(-log(y)) = klog(x) - klog(lambda) ]
-
-  Example:
-  (def w (repeatedly 100000 #(d/weibullvariate 1 0.5)))
-  (def cdf (d/cdf w :to-float true))
-  ; < 2.5 to match the wikipedia page for comparison
-  (def cdf (into {} (for [k (filter #(< % 2.5) (keys cdf))] [k (get cdf k))))
-  (plots/line (keys cdf) (vals cdf))
-  "
-  [lambda beta]
-  (* lambda (Math/pow (* -1.0 (Math/log (- 1.0 (rand))))
-                      (/ 1.0 beta))))
-
-
 (defn normalcdf
   "CDF for the normal distribution. mu is the mean and sigma is the standard deviation."
   [mu sigma x]
   (* 0.5 (+ 1
             (Erf/erf (/ (- x mu)
                         (* sigma c/sqrt2))))))
+
+(defn normalicdf
+  "ICDF for the normal distribution."
+  [mu sigma p]
+  (let [x (* c/sqrt2 (Erf/erfInv (- (* 2 p) 1)))]
+    (+ (* sigma x)
+       mu)))
