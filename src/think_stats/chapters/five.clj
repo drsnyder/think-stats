@@ -173,3 +173,25 @@
     (float
       (/ (count streaks)
          simulations))))
+
+(defn cohort
+  "Simulate a cohort of a given size over the specified duration with an event
+  probability of p.
+
+  Example: Simulating a cancer cluster by observing the incidences of cancer in a cohort
+  of 100 people over a 10 year period with an incidence of 1 case per thousand per year.
+
+  (cohort-sim 100 10 1/1000)
+  "
+  [size duration p]
+  (reduce + 0 (repeatedly duration #(random/binomialvariate size p))))
+
+(defn cohort-sim
+  "Simulation to estimate the distribution of events for a large number of cohorts of a
+  given size over a specified period with an incidence rate of p.
+
+  Example:
+  (d/cdff (cohort-sim 10000 100 10 1/1000) :to-float true)
+  "
+  [cohorts size duration p]
+  (repeatedly cohorts #(cohort size duration p)))

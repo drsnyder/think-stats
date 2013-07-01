@@ -43,7 +43,7 @@
 (defn normalvariate
   "Generate random values from a normal distribution with mean mu and standard deviation sigma."
   [mu sigma]
-  (stats/normalicdf mu sigma (- 1.0 (rand))))
+  (d/normalicdf mu sigma (- 1.0 (rand))))
 
 (defn lognormalvariate
   "Log normal distribution."

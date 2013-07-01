@@ -1,5 +1,7 @@
 (ns think-stats.probability
-  (:require (think-stats [util :as util])))
+  (:require (think-stats [util :as util]
+                         [random :as random]))
+  (:import org.apache.commons.math3.distribution.BinomialDistribution))
 
 (defn bernoulli-event
   "Generates a function than when called generates a 1 with probability p and a 0 with probability
@@ -55,8 +57,13 @@
 (def binomial-coefficient n-choose-k)
 
 (defn binomial-pmf
-  "PMF(k) of the binomial distribution."
-  [n k p]
+  "PMF(k) of the binomial distribution
+
   (* (n-choose-k n k)
     (Math/pow p k)
-    (Math/pow (- 1 p) (- n k))))
+    (Math/pow (- 1 p) (- n k)))
+
+  org.apache.commons.math3.distribution.BinomialDistribution is faster.
+  "
+  [n k p]
+  (.probability (random/binomial n p) k))
