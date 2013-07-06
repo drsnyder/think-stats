@@ -1,5 +1,6 @@
 (ns think-stats.probability
   (:require (think-stats [util :as util]
+                         [homeless :as h]
                          [random :as random]))
   (:import org.apache.commons.math3.distribution.BinomialDistribution))
 
@@ -67,3 +68,14 @@
   "
   [n k p]
   (.probability (random/binomial n p) k))
+
+(defn bayes
+  [p-hypothesis p-evidence-give-hypothesis p-evidence]
+  (/ (* p-hypothesis p-evidence-give-hypothesis) p-evidence))
+
+(defn p-drug-use-given-positive
+  [p-hypothesis specificity sensitivity]
+  (bayes p-hypothesis sensitivity
+         (+ (* p-hypothesis sensitivity)
+            (* (h/numeric-complement p-hypothesis)
+               (h/numeric-complement specificity)))))

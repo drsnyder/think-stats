@@ -81,14 +81,12 @@
       (let [mid (quot (+ low high) 2)
             [l h] (compute-bisection-ends dir s x low mid high)]
         (recur l h)))))
-    
 
 (defn approxiately-equal
   ([a b r]
    (>= r (Math/abs (- a b))))
   ([a b]
    (approxiately-equal a b 0.01)))
-    
 
 (defn round
   "Round number to decimals digits."
@@ -97,6 +95,11 @@
      (bigdec (/ (Math/round (* factor number)) factor))))
   ([number]
    (round number 0)))
-        
 
 (defn square [x] (* x x))
+
+(defn numeric-complement
+  "Numeric complement. 1 - n."
+  [n]
+  (assert (number? n) (str "Error numeric-complement: " (type n) " is not a number."))
+  (- 1 n))
