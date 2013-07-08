@@ -8,7 +8,9 @@
               [plots :as plots]
               [brfss :as brfss]
               [distributions :as d])
-            [clj-http.client :as client]))
+            [clojure.data.csv :as csv]
+            [clj-http.client :as client]
+            [clojure.java.io :as io]))
 
 ; TODO: confirm that this has the slope and intesect that we expect
 (defn pareto-cdf
@@ -123,3 +125,30 @@
                    (stats/trim logweights))]
         (util/write-to-csv "tmp/weights.csv" (conj xy ["x" "y"]))
         (util/write-to-csv "tmp/weights-log.csv" (conj xlogy ["x" "y"]))))
+
+(defn process-irs-csv
+  "Pulled data file from http://www.irs.gov/uac/SOI-Tax-Stats---Individual-Statistical-Tables-by-Size-of-Adjusted-Gross-Income."
+  [&{:keys [datafile] :or {datafile "data/10in11si.csv"}}]
+  (letfn [(process-bracket [s]
+            (let [tuple (map (comp util/str-to-float clojure.string/trim) 
+                             (-> s
+                                 (clojure.string/replace #"\$|,| or more" "")
+                                 (clojure.string/split #"under")))]
+              (if (= (count tuple) 2)
+                (/ (+ (first tuple) (second tuple)) 2)
+                (first tuple))))
+          (process-values [s]
+            (map (fn [x]
+                   (-> x
+                       (clojure.string/replace #"\[|\]|," "")
+                       util/str-to-float ))
+                 s))
+          (make-hist [d]
+            (into (sorted-map) (for [[b number] d] [b number])))]
+    (let [data (csv/read-csv (io/reader datafile))
+          data (drop-while #(not= (first %) "$1 under $5,000") data)
+          data (take-while #(not=  (first %) "Accumulated from Smallest Size of Adjusted Gross Income") data)
+          data (map #(cons (process-bracket (first %))
+                           (process-values (rest %)))
+                    (map (partial take 3) data))]
+      [data (make-hist data)])))

@@ -16,16 +16,48 @@
     (/ (sum s) 
        (count s))))
 
+(defn median
+  [s &{:keys [sorted] :or {sorted false}}]
+  (d/percentile-w s 50 :sorted sorted))
+
+
+(defn mean-variance
+  [s f n]
+  (assert (sequential? s) "Cannot compute the variance on a non-seq.")
+  (when-let [m (mean s)]
+    (/ (sum (map #(f (- % m)) s))
+       n)))
 
 (defn variance
   [s &{:keys [sample] :or {sample false}}]
-  (assert (sequential? s) "Cannot compute the variance on a non-seq.")
   (let [n (if sample 
-            (- (count s) 1) 
+            (- (count s) 1)
             (count s))]
-    (when-let [m (mean s)]
-      (/ (sum (map #(h/square (- % m)) s))
-         n))))
+    (mean-variance s h/square n)))
+
+(defn mean-cubed-variance
+  [s]
+  ((mean-variance s h/cube (count s))))
+
+(def m2 (fn [s] (mean-variance s h/square (count s))))
+(def m3 (fn [s] (mean-variance s h/cube (count s))))
+
+(defn g1
+  [s]
+  (/ (m3 s) (Math/pow (m2 s) 3/2)))
+
+(def skew g1)
+
+(defn gp
+  "Compute Pearson’s median skewness coefficient."
+  [s]
+  (assert (sequential? s) "Cannot compute Pearson's median skewness coefficient on a non-seq.")
+  (let [mean (mean s)
+        md (median s)
+        std (stddev s)]
+    (/ (* 3 (- mean md))
+       std)))
+
 
 (defn stddev
   [s &{:keys [sample] :or {sample false}}]
@@ -39,20 +71,13 @@
   (let [s (if trim? (trim s p) (sort s))]
     {:min (first s)
      :25th (d/percentile-w s 25 :sorted true)
-     :median (d/percentile-w s 50 :sorted true)
+     :median (median s :sorted true)
      :mean (float (mean s))
      :stddev (stddev s :sample true)
      :75th (d/percentile-w s 75 :sorted true)
      :95th (d/percentile-w s 95 :sorted true)
      :max (last s)
      :count (count s)}))
-
-
-(defn hist
-  [s]
-  (assert (sequential? s) "Cannot compute the hist on a non-seq.")
-  (into (sorted-map) (for [[k v] (frequencies s)] [k v])))
-
 
 (defn trim
   "Trim's s by taking p % elements from both ends. The sequence is sorted before being trimmed.
@@ -72,15 +97,26 @@
   ([s]
    (trim s 0.01)))
 
+(defn hist
+  "Create a histogram from a sequence."
+  [s]
+  (assert (sequential? s) "Cannot compute the hist on a non-seq.")
+  (into (sorted-map) (for [[k v] (frequencies s)] [k v])))
+
+(defn hist->pmf
+  "Convert a histogram into a PMF."
+  [h & {:keys [to-float] :or {to-float false}}]
+  (let [total (reduce + (for [[k v] (seq h)] v))]
+    (into (sorted-map) (for [[k v] (seq h)
+                             :let [m (/ v total)
+                                   m (if to-float (float m) m)]] 
+                         [k m]))))
 
 (defn pmf
+  "Generate a PMF from a seq."
   [s &{:keys [to-float] :or {to-float false}}]
   (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
-  (let [n (count s)]
-    (into (sorted-map) (for [[k v] (frequencies s)
-                   :let [m (/ v n)
-                         m (if to-float (float m) m)]]
-               [k m]))))
+  (hist->pmf (frequencies s) :to-float to-float))
 
 (defn pmf-entry->value
   [e]

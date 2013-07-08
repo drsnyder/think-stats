@@ -56,6 +56,11 @@
     (count (filter #(<= % x) s)) 
     (count s)))
 
+
+(defn hist->cdf
+  "TODO:"
+  [h])
+
 (defn cdf
   [s &{:keys [to-float] :or {to-float true}}]
   (assert (sequential? s) "Cannot compute the cdf on a non-seq data set.")
