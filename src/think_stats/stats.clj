@@ -39,29 +39,40 @@
   [s]
   ((mean-variance s h/cube (count s))))
 
+(defn stddev
+  [s &{:keys [sample] :or {sample false}}]
+  (Math/sqrt (variance s :sample sample)))
+
 (def m2 (fn [s] (mean-variance s h/square (count s))))
 (def m3 (fn [s] (mean-variance s h/cube (count s))))
 
 (defn g1
+  "Compute the g1 skewness coefficient given m2 and m3."
+  [m2 m3]
+  (/ m3 (Math/pow m2 3/2)))
+
+(defn seq->g1
+  "Given a sequence, compute g1."
   [s]
-  (/ (m3 s) (Math/pow (m2 s) 3/2)))
+  (assert (sequential? s) "Cannot compute g1 skewness coefficient on a non-seq.")
+  (g1 (m3 s) (m2 s)))
 
 (def skew g1)
 
 (defn gp
-  "Compute Pearson’s median skewness coefficient."
+  "Compute Pearson's median skewness coefficient given the mean, median (md) and the standard deviation (std)."
+  [mean md std]
+  (/ (* 3 (- mean md))
+     std))
+
+(defn seq->gp
+  "Compute Pearson’s median skewness coefficient from a sequence."
   [s]
   (assert (sequential? s) "Cannot compute Pearson's median skewness coefficient on a non-seq.")
   (let [mean (mean s)
         md (median s)
         std (stddev s)]
-    (/ (* 3 (- mean md))
-       std)))
-
-
-(defn stddev
-  [s &{:keys [sample] :or {sample false}}]
-  (Math/sqrt (variance s :sample sample)))
+    (gp mean md std)))
 
 
 (declare trim)
