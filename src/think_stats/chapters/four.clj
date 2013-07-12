@@ -136,7 +136,7 @@
                                  (clojure.string/split #"under")))]
               (if (= (count tuple) 2)
                 (/ (+ (first tuple) (second tuple)) 2)
-                (first tuple))))
+                (/ (* 3 (first tuple) ) 2))))
           (process-values [s]
             (map (fn [x]
                    (-> x
