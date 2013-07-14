@@ -56,6 +56,8 @@
     (count (filter #(<= % x) s)) 
     (count s)))
 
+; TODO: move cdf to it's own NS. refactor to be more general
+; TODO: this is seq->cdf
 (defn cdf
   [s &{:keys [to-float] :or {to-float true}}]
   (assert (sequential? s) "Cannot compute the cdf on a non-seq data set.")

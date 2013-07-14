@@ -126,6 +126,7 @@
         (util/write-to-csv "tmp/weights.csv" (conj xy ["x" "y"]))
         (util/write-to-csv "tmp/weights-log.csv" (conj xlogy ["x" "y"]))))
 
+; TODO: include those with 0 income
 (defn process-irs-csv
   "Pulled data file from http://www.irs.gov/uac/SOI-Tax-Stats---Individual-Statistical-Tables-by-Size-of-Adjusted-Gross-Income."
   [&{:keys [datafile] :or {datafile "data/10in11si.csv"}}]
