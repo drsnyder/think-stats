@@ -81,7 +81,7 @@
   (cond
     (< prob 0) nil
     (> prob 1) nil
-    :else 
+    :else
     (let [vidx (h/bisect vls prob :left)]
       (nth kys vidx))))
 

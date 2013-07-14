@@ -66,6 +66,14 @@
   (assert (empty? (filter (complement number?) (keys h))) "Cannot compute the using non-numerical items.")
   (reduce + (map (partial apply *) (seq h))))
 
+(defn hist->cdf
+  "Compute the CDF of a histogram."
+  [h]
+  (assert (map? h) "Cannot compute the CDF of a histogram on a non-map.")
+
+  (let [total (util/sum (vals h))]
+    (into (sorted-map) (for [[i v] (map vector (keys h) (reductions + (vals h)))]
+                         [i (/ v total)]))))
 
 (defn pmf
   "Generate a PMF from a seq."
@@ -155,4 +163,3 @@
 (defn pmf->unbiased
   [pmf]
   (pmf->biased pmf :invert true))
-
