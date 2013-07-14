@@ -1,6 +1,7 @@
 (ns think-stats.chapters.three
   (:require (think-stats [stats :as stats]
                          [util :as util]
+                         [hist :as hist]
                          [survey :as s]
                          [homeless :as h]
                          [pregnancy :as p]
@@ -18,15 +19,15 @@
    (range 40 45) 3
    (range 45 50) 2})
 
-(def total-classes (stats/sum (vals sizes)))
+(def total-classes (util/sum (vals sizes)))
 
 (def sizes-pmf (into {} (for [[k v] sizes] [(stats/mean k) (/ v total-classes)])))
 
 (defn plot-class-sizes
   [sizes-pmf &{:keys [csv-out r-script to-plot] :or 
      {csv-out "plots/3-sizes.csv" r-script "plots/3-sizes.R" to-plot "plots/3-sizes.png"}}]
-  (let [sampled (stats/pmf->key-ordered (h/map-map float sizes-pmf))
-        unbiased (stats/pmf->key-ordered (stats/pmf->unbiased sizes-pmf))
+  (let [sampled (hist/pmf->key-ordered (h/map-map float sizes-pmf))
+        unbiased (hist/pmf->key-ordered (hist/pmf->unbiased sizes-pmf))
         combined (concat (list (list "size" "sampled" "unbiased"))
                          (for [k (keys sampled)]
                            (list k (sampled k) (unbiased k))))]
@@ -45,9 +46,9 @@
             :or {csv-out "plots/3-speeds.csv" r-script "plots/3-speeds.R" 
                  to-plot "plots/3-speeds.png"}}]
    (let [speeds (get-speeds)
-         speeds-pmf (h/map-map float (stats/pmf speeds))
+         speeds-pmf (h/map-map float (hist/pmf speeds))
          speeds->unbias-by-runner (fn [pmf speed]
-                                    (stats/normalize-pmf
+                                    (hist/normalize-pmf
                                       (into {} (for [[k v] pmf] 
                                                  [k (* v
                                                        (Math/abs (- v speed)))]))))

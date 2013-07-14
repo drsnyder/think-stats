@@ -65,3 +65,8 @@
           (empty? l) nil
           (= (first l) e) (recur (rest l) (inc c))
           :else (recur (rest l) 0))))
+
+
+(defn sum
+  [s]
+  (reduce + s))

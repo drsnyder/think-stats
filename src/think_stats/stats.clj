@@ -1,19 +1,17 @@
 (ns think-stats.stats
   (:require (think-stats
+              [util :as util]
               [distributions :as d]
               [homeless :as h]))
   (:import org.apache.commons.math3.distribution.TDistribution))
 
-(defn sum
-  [s]
-  (reduce + s))
 
 (defn mean
   [s]
   (assert (sequential? s) "Cannot compute the mean on a non-seq.")
   (if (empty? s)
     nil
-    (/ (sum s) 
+    (/ (util/sum s)
        (count s))))
 
 (defn median
@@ -25,7 +23,7 @@
   [s f n]
   (assert (sequential? s) "Cannot compute the variance on a non-seq.")
   (when-let [m (mean s)]
-    (/ (sum (map #(f (- % m)) s))
+    (/ (util/sum (map #(f (- % m)) s))
        n)))
 
 (defn variance
@@ -107,111 +105,6 @@
               left  (drop n))))
   ([s]
    (trim s 0.01)))
-
-(defn hist
-  "Create a histogram from a sequence."
-  [s]
-  (assert (sequential? s) "Cannot compute the hist on a non-seq.")
-  (into (sorted-map) (for [[k v] (frequencies s)] [k v])))
-
-(defn hist->pmf
-  "Convert a histogram into a PMF."
-  [h & {:keys [to-float] :or {to-float false}}]
-  (let [total (reduce + (for [[k v] (seq h)] v))]
-    (into (sorted-map) (for [[k v] (seq h)
-                             :let [m (/ v total)
-                                   m (if to-float (float m) m)]] 
-                         [k m]))))
-
-(defn pmf
-  "Generate a PMF from a seq."
-  [s &{:keys [to-float] :or {to-float false}}]
-  (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
-  (hist->pmf (frequencies s) :to-float to-float))
-
-(defn pmf-entry->value
-  [e]
-  (first e))
-
-(defn pmf-entry->freq
-  [e]
-  (second e))
-
-
-(defn pmf->key-ordered
-  [pmf &{:keys [dir] :or {dir :asc}}]
-  (apply sorted-map-by (if (= dir :asc) < >) (flatten (seq pmf))))
-
-
-(defn pmf->remaining-lifetime
-  [pmf] 
-  (loop [lifetimes (sort > (keys pmf))
-         acc {}
-         total 0]
-    (if (not (empty? lifetimes))
-      (let [k (first lifetimes)
-            new-total (+ (pmf k) total)]
-        (recur (rest lifetimes)
-               (assoc acc k new-total)
-               new-total))
-      acc)))
-
-(defn pmf->mean
-  [pmf]
-  (sum
-    (map #(* (pmf-entry->value %) 
-            (pmf-entry->freq %)) 
-         (seq pmf))))
-
-(defn pmf->variance
-  [pmf]
-  (let [m (pmf->mean pmf)]
-    (sum 
-      (map #(* (pmf-entry->freq %)
-              (h/square (- (pmf-entry->value %) m)))
-           pmf))))
-
-
-(defn bin-pmf-freq
-  "Bin PMF values by applying binfn to each value in the PMF. 
-  The resulting bins contain the sum of the frequencies that mapped to that bin."
-  [pmf binfn]
-  (sum (map pmf-entry->freq 
-            (filter #(binfn (pmf-entry->value %)) 
-                    (seq pmf)))))
-
-(defn filter-map
-  "Filter a map by the keys matching (f k)."
-  [pmf f]
-  (select-keys pmf (for [[k v] pmf :when (f k)] k)))
-
-
-(defn normalize-pmf
-  ([pmf fraction]
-   (if (empty? pmf)
-     pmf
-     (let [factor (/ fraction (sum (vals pmf)))]
-       (into {} (for [[k v] pmf] [k (* v factor)])))))
-  ([pmf]
-   (normalize-pmf pmf 1.0)))
-
-
-(defn pmf->biased
-  "Bias a PMF (or unbias if invert is true). If the PMF is the distribution of reported values then
-  any oversampling would be in proportion to the values. See the class size example. And the 3-size plot."
-  [pmf &{:keys [invert] :or {invert false}}]
-  (let [transf (if invert 
-                (fn [k v] (* v (/ 1 k))) 
-                (fn [k v] (* v k)))
-        t (into {} (for [[k v] pmf] [k (transf k v)]))]
-    (normalize-pmf t)))
-
-(defn pmf->unbiased
-  [pmf]
-  (pmf->biased pmf :invert true))
-
-
-
 
 (defn create-t-dist
   "Create a t-distribution object. Uses org.apache.commons.math3.distribution.TDistribution."
