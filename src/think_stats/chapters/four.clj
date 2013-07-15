@@ -133,6 +133,7 @@
   (letfn [(process-bracket [s]
             (let [tuple (map (comp util/str-to-float clojure.string/trim) 
                              (-> s
+                                 (clojure.string/replace #"No adjusted gross income" "0")
                                  (clojure.string/replace #"\$|,| or more" "")
                                  (clojure.string/split #"under")))]
               (if (= (count tuple) 2)
@@ -147,8 +148,8 @@
           (make-hist [d]
             (into (sorted-map) (for [[b number] d] [b number])))]
     (let [data (csv/read-csv (io/reader datafile))
-          data (drop-while #(not= (first %) "$1 under $5,000") data)
-          data (take-while #(not=  (first %) "Accumulated from Smallest Size of Adjusted Gross Income") data)
+          data (drop-while #(not= (first %) "No adjusted gross income") data)
+          data (take-while #(not= (first %) "Accumulated from Smallest Size of Adjusted Gross Income") data)
           data (map #(cons (process-bracket (first %))
                            (process-values (rest %)))
                     (map (partial take 3) data))]
