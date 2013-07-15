@@ -12,6 +12,7 @@
               [brfss :as brfss]
               [stats :as stats]
               [hist :as hist]
+              [cdf :as cdf]
               [plots :as plots])
             (think-stats.chapters [three :as three]
                                   [four :as four]
@@ -19,6 +20,5 @@
             [clj-http.client :as client]
             [clojure.pprint :refer [pprint]]
             [midje.repl :refer :all]
-            [clojure.tools.namespace.repl :refer  (refresh refresh-all)]))
-
-
+            [clojure.tools.namespace.repl :refer  (refresh refresh-all)])
+  (:import [think-stats.types]))
