@@ -2,6 +2,7 @@
   (:require (think-stats
               [random :as random]
               [stats :as stats]
+              [cdf :as cdf]
               [util :as util]
               [survey :as s]
               [homeless :as h]
@@ -21,8 +22,8 @@
   [n alpha threshold x-min x-max step]
   (let [r-script "plots/pareto.R"
         csv-out "plots/pareto.csv"
-        p (repeatedly n (fn [] (d/paretovariate alpha threshold)))
-        cdf (d/cdff p :to-float true)
+        p (repeatedly n (fn [] (random/paretovariate alpha threshold)))
+        cdf (cdf/cdff p)
         xs (range x-min x-max step)
         ys (map cdf xs)
         csv (cons (list "x" "y") (map list xs ys))]
@@ -43,7 +44,7 @@
   (let [r-script "plots/exponential.R"
         csv-out "plots/exponential.csv"
         e (repeatedly n (fn [] (random/expovariate lambda)))
-        cdf (d/cdff e :to-float true)
+        cdf (cdf/cdff e)
         xs (range x-min x-max step)
         ys (map cdf xs)
         csv (cons (list "x" "y") (map list xs ys))]
@@ -80,7 +81,7 @@
   (let [features (extract-features corpus)
         freq (frequencies features)
         ; since these are discrete values, dedup the frequencies
-        cdf (d/cdf (distinct (vec (vals freq))))]
+        cdf (h/map-map float (cdf/cdf (distinct (vec (vals freq)))) :dest (sorted-map))]
     ; TODO: compute the x intercept and the slope
     {:cdf cdf
      :features features

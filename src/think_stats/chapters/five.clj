@@ -1,6 +1,7 @@
 (ns think-stats.chapters.five
   (:require (think-stats
               [stats :as stats]
+              [cdf :as cdf]
               [distributions :as d]
               [util :as util]
               [probability :as p]
@@ -109,9 +110,9 @@
         csv-out "plots/bakery.csv"
         csv-raw-out "plots/bakery-raw.csv"
         p-loafs (map int (baker-trial mean stddev n sims))
-        pcdf (d/cdf p-loafs :to-float true)
+        pcdf (h/map-map float (cdf/cdf p-loafs) :dest (sorted-map))
         bakery (map int (repeatedly sims #(random/normalvariate (stats/mean p-loafs) (stats/stddev p-loafs))))
-        bcdf (d/cdf bakery :to-float true)]
+        bcdf (h/map-map float (cdf/cdf bakery) :dest (sorted-map))]
     (util/write-to-csv csv-out (conj
                                (map vector
                                     (keys bcdf)
@@ -191,7 +192,7 @@
   given size over a specified period with an incidence rate of p.
 
   Example:
-  (d/cdff (cohort-sim 10000 100 10 1/1000) :to-float true)
+  (cdf/cdff (cohort-sim 10000 100 10 1/1000))
   "
   [cohorts size duration p]
   (repeatedly cohorts #(cohort size duration p)))

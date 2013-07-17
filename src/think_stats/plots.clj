@@ -2,6 +2,7 @@
   (:require (think-stats
               [util :as util]
               [stats :as stats]
+              [cdf :as cdf]
               [distributions :as d]
               [homeless :as h])))
 
@@ -11,7 +12,7 @@
   Example using the exponential distribution using lambda = 1:
 
   (def e (take 1000 (repeatedly #(random/expovariate 1))))
-  (def cdf (d/cdff e :to-float true))
+  (def cdf (cdf/cdff e))
   (plots/line cdf (range 0 2.5 0.01)) ; exponential distribution 
 
   ; complement of the exponential distribution - straight line with slope -lambda
@@ -32,8 +33,8 @@
 
   Example:
 
-  (def p (repeatedly 10000 (fn [] (d/paretovariate 1 0.5)))) 
-  (def cdf (d/cdff p :to-float true))
+  (def p (repeatedly 10000 (fn [] (random/paretovariate 1 0.5))))
+  (def cdf (cdf/cdff p))
   (def xs (range 0 10 0.1))
   (def ys (map cdf xs))
 
@@ -44,7 +45,7 @@
 
   "
   [x-vals y-vals &{:keys [r-script csv-out to-plot title] 
-                   :or {r-script "plots/line.R" csv-out "plots/line.csv" 
+                   :or {r-script "plots/line.R" csv-out "plots/line.csv"
                         to-plot "plots/line.png" title "line"}}]
   (let [header ["x" "y"]
         data   (map vector x-vals y-vals)

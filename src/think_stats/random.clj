@@ -108,7 +108,7 @@
 
   Example:
   (def w (repeatedly 100000 #(d/weibullvariate 1 0.5)))
-  (def cdf (d/cdf w :to-float true))
+  (def cdf (cdf/cdf w))
   ; < 2.5 to match the wikipedia page for comparison
   (def cdf (into {} (for [k (filter #(< % 2.5) (keys cdf))] [k (get cdf k))))
   (plots/line (keys cdf) (vals cdf))
@@ -117,3 +117,27 @@
   (* lambda (Math/pow (* -1.0 (Math/log (- 1.0 (rand))))
                       (/ 1.0 beta))))
 
+(defn paretovariate
+  "See http://en.wikipedia.org/wiki/Pareto_distribution for random sample generation."
+  ([alpha x-min]
+   (* x-min
+     (/ 1.0 (Math/pow (- 1.0 (rand))
+                      (/ 1 alpha)))))
+  ([alpha]
+   (paretovariate alpha 1)))
+
+(defn paretomedian
+  "Compute the median of a Pareto distribution with the given alpha and threshold."
+  ([alpha x-min]
+   (* x-min (Math/pow 2 (/ 1 alpha))))
+  ([alpha]
+   (paretomedian alpha 1)))
+
+(defn paretomean
+  "Compute the mean of a Pareto distribution with the given alpha and threshold."
+  ([alpha x-min]
+   (assert (> alpha 1))
+   (/ (* alpha x-min)
+      (- alpha 1)))
+  ([alpha]
+   (paretomean alpha 1)))

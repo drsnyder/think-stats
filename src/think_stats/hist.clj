@@ -2,6 +2,7 @@
   (:require (think-stats [util :as util]
                          [homeless :as h])))
 
+; TODO: should this be a multi?
 (defn seq->hist
   "Build a histogram from a sequence."
   [s]
@@ -70,7 +71,6 @@
   "Compute the CDF of a histogram."
   [h]
   (assert (map? h) "Cannot compute the CDF of a histogram on a non-map.")
-
   (let [total (util/sum (vals h))]
     (into (sorted-map) (for [[i v] (map vector (keys h) (reductions + (vals h)))]
                          [i (/ v total)]))))

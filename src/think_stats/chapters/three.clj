@@ -2,6 +2,7 @@
   (:require (think-stats [stats :as stats]
                          [util :as util]
                          [hist :as hist]
+                         [cdf :as cdf]
                          [survey :as s]
                          [homeless :as h]
                          [pregnancy :as p]
@@ -68,7 +69,7 @@
       :or {csv-out "plots/3-speeds-cdf.csv" r-script "plots/3-speeds-cdf.R" 
            to-plot "plots/3-speeds-cdf.png"}}]
    (let [speeds (get-speeds)
-         speeds-cdf (h/map-map float (d/cdf speeds) :dest (sorted-map))
+         speeds-cdf (h/map-map float (cdf/cdf speeds) :dest (sorted-map))
          speeds-csv (concat (list (list "speed" "cdf(x)")) 
                             (for [k (keys speeds-cdf)] (list k 
                                                              (speeds-cdf k))))]
@@ -81,14 +82,14 @@
       :or {csv-out "plots/3-birthweights-cdf.csv" r-script "plots/3-birthweights-cdf.R" 
            to-plot "plots/3-birthweights-cdf.png"}}]
   (let [totalwgts (birth-weight-data data-file)
-         cdf-data (d/cdf totalwgts)
-         cdf (d/cdff totalwgts)
-         cdf-sample-data (d/cdf (d/sample-cdf cdf 1000))
+         cdf-data (h/map-map float (cdf/cdf totalwgts) :dest (sorted-map))
+         cdf (cdf/cdff totalwgts)
+         cdf-sample-data (cdf/cdf (cdf/sample-cdf cdf 1000))
          csv (concat (list (list "weight" "survey" "sample"))
                      (for [k (sort (keys cdf-data)) :when (and 
                                                             (get cdf-data k) 
                                                             (get cdf-sample-data k))]
-                       (list k (float (get cdf-data k)) 
+                       (list k (float (get cdf-data k))
                              (float (get cdf-sample-data k)))))]
      (util/write-to-csv csv-out csv)
      (util/shell-exec (format "Rscript %s %s %s" r-script csv-out to-plot))))
