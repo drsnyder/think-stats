@@ -19,6 +19,7 @@
   (d/percentile-w s 50 :sorted sorted))
 
 
+; TODO: refactor this to make it more composable
 (defn mean-variance
   [s f n]
   (assert (sequential? s) "Cannot compute the variance on a non-seq.")
@@ -26,9 +27,10 @@
     (/ (util/sum (map #(f (- % m)) s))
        n)))
 
+; TODO: refactor this to take values, mean, and n to make it more composable
 (defn variance
   [s &{:keys [sample] :or {sample false}}]
-  (let [n (if sample 
+  (let [n (if sample
             (- (count s) 1)
             (count s))]
     (mean-variance s h/square n)))
@@ -37,6 +39,7 @@
   [s]
   ((mean-variance s h/cube (count s))))
 
+; TODO: refactor this to take values, mean, and n to make it more composable
 (defn stddev
   [s &{:keys [sample] :or {sample false}}]
   (Math/sqrt (variance s :sample sample)))

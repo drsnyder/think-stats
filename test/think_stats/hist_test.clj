@@ -3,14 +3,14 @@
   (:require (think-stats [hist :as hist])))
 
 (facts :seq->hist
-  ((hist/seq->hist [1 2 3 4 4]) 4) => 2
-  ((hist/seq->hist [1 2 3 4 4]) 1) => 1)
+  ((hist/hist [1 2 3 4 4]) 4) => 2
+  ((hist/hist [1 2 3 4 4]) 1) => 1)
 
 (facts :hist->mass
-  (hist/hist->mass (hist/seq->hist (range 0 10))) => 10)
+  (hist/hist->mass (hist/hist (range 0 10))) => 10)
 
 (facts :hist->mean
-  (hist/hist->mean (hist/seq->hist (range 0 10))) => 9/2)
+  (hist/hist->mean (hist/hist (range 0 10))) => 9/2)
 
 (facts :pmf
        ((hist/pmf [1 2 3 4]) 2) => 1/4

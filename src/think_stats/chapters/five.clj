@@ -1,6 +1,7 @@
 (ns think-stats.chapters.five
   (:require (think-stats
               [stats :as stats]
+              [homeless :as h]
               [cdf :as cdf]
               [distributions :as d]
               [util :as util]

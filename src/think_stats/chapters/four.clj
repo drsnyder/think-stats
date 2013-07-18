@@ -2,6 +2,7 @@
   (:require (think-stats
               [random :as random]
               [stats :as stats]
+              [hist :as hist]
               [cdf :as cdf]
               [util :as util]
               [survey :as s]
@@ -127,7 +128,6 @@
         (util/write-to-csv "tmp/weights.csv" (conj xy ["x" "y"]))
         (util/write-to-csv "tmp/weights-log.csv" (conj xlogy ["x" "y"]))))
 
-; TODO: include those with 0 income
 (defn process-irs-csv
   "Pulled data file from http://www.irs.gov/uac/SOI-Tax-Stats---Individual-Statistical-Tables-by-Size-of-Adjusted-Gross-Income."
   [&{:keys [datafile] :or {datafile "data/10in11si.csv"}}]
@@ -153,5 +153,24 @@
           data (take-while #(not= (first %) "Accumulated from Smallest Size of Adjusted Gross Income") data)
           data (map #(cons (process-bracket (first %))
                            (process-values (rest %)))
-                    (map (partial take 3) data))]
-      [data (make-hist data)])))
+                    (map (partial take 3) data))
+          h (make-hist data)
+          mean (hist/hist->mean h)
+          cdff (cdf/cdff h)
+          median (cdff 0.5 :value)
+          pmf (hist/hist->pmf h)
+          stddev (hist/pmf->stddev pmf)
+          total-reporting-taxes (reduce +  (map second  (seq  h)))
+          pop-below-mean (reduce +
+                                 (map second  (take-while
+                                                #(<=  (first %) mean)
+                                                (seq  h))))]
+      ; TODO: compute the skew and the gini coeff
+      {:raw data
+       :hist h
+       :cdff cdff
+       :mean mean
+       :median median
+       :population-below-mean pop-below-mean
+       :total total-reporting-taxes
+       :fraction-below-mean (/ pop-below-mean total-reporting-taxes)})))

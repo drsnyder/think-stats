@@ -1,6 +1,7 @@
 (ns think-stats.types)
 
 (derive clojure.lang.PersistentTreeMap :types/map)
+(derive clojure.lang.PersistentHashMap :types/map)
 (derive clojure.lang.PersistentArrayMap :types/map)
 
 (derive clojure.lang.PersistentVector :types/seq)

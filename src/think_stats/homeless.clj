@@ -6,7 +6,11 @@
   [f m &{:keys [dest] :or {dest {}}}]
   (into dest (for [[k v] m] [k (f v)])))
 
-(defn- vswap! 
+(defn map->into
+  [m dest]
+  (into dest (for [[k v] m] [k v])))
+
+(defn- vswap!
   [v a b]
   (let [t (nth v b)]
     (assoc! v b (nth v a))

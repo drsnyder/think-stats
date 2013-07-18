@@ -1,15 +1,22 @@
 (ns think-stats.hist
   (:require (think-stats [util :as util]
+                         [types :as types]
                          [homeless :as h])))
 
-; TODO: should this be a multi?
-(defn seq->hist
-  "Build a histogram from a sequence."
-  [s]
-  (assert (sequential? s) "Cannot compute the hist on a non-seq.")
-  (into (sorted-map)
-        (for [[k v] (frequencies s)]
-          [k v])))
+(defmulti hist
+  "Build a histogram from a sequence or a map. The resulting
+  histogram will be key sorted unless an alternate destination is supplied."
+  (fn [i &[dest]] (class i)))
+
+(defmethod hist :types/seq
+  [s &{:keys [dest] :or {dest (sorted-map)}}]
+  (h/map->into (frequencies s) dest))
+
+(defmethod hist :types/map
+  [m &{:keys [dest] :or {dest (sorted-map)}}]
+  (prn m)
+  (h/map->into m dest))
+
 
 (declare hist->mass)
 (declare hist->area)
@@ -20,21 +27,22 @@
   (assert (map? h) "Cannot compute the PMF of a histogram on a non-map.")
   (let [total (hist->mass h)]
     (into (sorted-map) (for [[k v] (seq h)
-                             :let [m (/ v total)
-                                   m (if to-float (float m) m)]]
+                             :let [m (/ v total)]]
                          [k m]))))
 
-(defn hist->cdf
-  "Assumes that h is sorted. Another reason to create a type?"
-  [h &{:keys [to-float] :or {to-float false}}]
-  (assert (map? h) "Cannot compute the CDF of a histogram on a non-map.")
-  (let [total (hist->mass h)]
-    (into (sorted-map)
-         (for [[i acc] (map vector (keys h) (reductions + (vals h)))
-               :let [y (/ acc total)
-                     y (if to-float (float y) y)]]
-           [i y]))))
+(defn pmf
+  "Generate a PMF from a seq."
+  [s &{:keys [to-float] :or {to-float false}}]
+  (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
+  (hist->pmf (hist s)))
 
+(defn hist->cdf
+  "Compute the CDF of a histogram."
+  [h]
+  (assert (map? h) "Cannot compute the CDF of a histogram on a non-map.")
+  (let [total (util/sum (vals h))]
+    (into (sorted-map) (for [[i v] (map vector (keys h) (reductions + (vals h)))]
+                         [i (/ v total)]))))
 
 (defn hist->mean
   "Compute the mean given a histogram."
@@ -43,11 +51,6 @@
   (let [mass (hist->mass h)]
     (/ (hist->area h)
        mass)))
-
-(defn hist->median
-  "TODO: convert to CDF then fetch the value that corresponds to 0.5."
-  [h]
-  (assert (map? h) "Cannot compute the median of a histogram on a non-map."))
 
 (defn hist->mass
   [h]
@@ -67,19 +70,7 @@
   (assert (empty? (filter (complement number?) (keys h))) "Cannot compute the using non-numerical items.")
   (reduce + (map (partial apply *) (seq h))))
 
-(defn hist->cdf
-  "Compute the CDF of a histogram."
-  [h]
-  (assert (map? h) "Cannot compute the CDF of a histogram on a non-map.")
-  (let [total (util/sum (vals h))]
-    (into (sorted-map) (for [[i v] (map vector (keys h) (reductions + (vals h)))]
-                         [i (/ v total)]))))
 
-(defn pmf
-  "Generate a PMF from a seq."
-  [s &{:keys [to-float] :or {to-float false}}]
-  (assert (sequential? s) "Cannot compute the pmf on a non-seq.")
-  (hist->pmf (seq->hist s) :to-float to-float))
 
 (defn pmf-entry->value
   [e]
@@ -96,7 +87,7 @@
 
 
 (defn pmf->remaining-lifetime
-  [pmf] 
+  [pmf]
   (loop [lifetimes (sort > (keys pmf))
          acc {}
          total 0]
@@ -122,6 +113,10 @@
       (map #(* (pmf-entry->freq %)
               (h/square (- (pmf-entry->value %) m)))
            pmf))))
+
+(defn pmf->stddev
+  [pmf]
+  (Math/sqrt (pmf->variance pmf)))
 
 
 (defn bin-pmf-freq

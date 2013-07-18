@@ -23,7 +23,7 @@
   [data-file &{:keys [csv-out r-script to-plot week-min week-max week-min week-max] 
                :or {csv-out "plots/2.1.csv" r-script "plots/2.1.R" to-plot "plots/2.1.png" week-min 0 week-max 99} 
                :as params}]
-  (let [[first-babies other-babies] (map hist/seq->hist (apply load-data data-file params))
+  (let [[first-babies other-babies] (map hist/hist (apply load-data data-file params))
         upper (+ (max (apply max (keys first-babies)) (apply max (keys other-babies))) 1)
         lower (min (apply min (keys first-babies)) (apply min (keys other-babies)))
         combined (concat (list (list "prglength" "first" "others")) 
