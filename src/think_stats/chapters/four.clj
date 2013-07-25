@@ -171,6 +171,12 @@
        :cdff cdff
        :mean mean
        :median median
+       :stddev stddev
+       :stddev2 (Math/sqrt (stats/mean-variance h h/square total-reporting-taxes mean))
+       :g1 (stats/g1
+             (stats/m2 h total-reporting-taxes mean)
+             (stats/m3 h total-reporting-taxes mean))
+       :gp (stats/gp mean median stddev)
        :population-below-mean pop-below-mean
        :total total-reporting-taxes
        :fraction-below-mean (/ pop-below-mean total-reporting-taxes)})))

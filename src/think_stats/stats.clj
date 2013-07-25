@@ -1,51 +1,74 @@
 (ns think-stats.stats
   (:require (think-stats
               [util :as util]
+              [types :as types]
               [distributions :as d]
               [homeless :as h]))
   (:import org.apache.commons.math3.distribution.TDistribution))
 
 
 (defn mean
-  [s]
-  (assert (sequential? s) "Cannot compute the mean on a non-seq.")
-  (if (empty? s)
-    nil
-    (/ (util/sum s)
-       (count s))))
+  ([s n]
+   (assert (sequential? s) "Cannot compute the mean on a non-seq.")
+   (if (empty? s)
+     nil
+     (/ (util/sum s)
+        n)))
+  ([s]
+   (mean s (count s))))
 
 (defn median
   [s &{:keys [sorted] :or {sorted false}}]
   (d/percentile-w s 50 :sorted sorted))
 
 
-; TODO: refactor this to make it more composable
-(defn mean-variance
-  [s f n]
-  (assert (sequential? s) "Cannot compute the variance on a non-seq.")
-  (when-let [m (mean s)]
-    (/ (util/sum (map #(f (- % m)) s))
-       n)))
+(defmulti mean-variance
+  "Compute the mean difference of each element in s and apply f to computed value.
+  The seq s can be either a map or a sequence. In the case of a map, the seq is treated
+  as a histogram."
+  (fn [s f n m] (class s)))
 
-; TODO: refactor this to take values, mean, and n to make it more composable
+(defmethod mean-variance :types/seq
+  [s f n m]
+  (/ (util/sum (map #(f (- % m)) s))
+     n))
+
+(defmethod mean-variance :types/map
+  [s f n m]
+  ; when we have a map we are working with a histogram. in this case, multiply
+  ; each mean difference (key) by the weight (value)
+  (/ (util/sum (map #(* (f (- (first %) m)) (second %)) (seq s)))
+     n))
+
 (defn variance
-  [s &{:keys [sample] :or {sample false}}]
-  (let [n (if sample
-            (- (count s) 1)
-            (count s))]
-    (mean-variance s h/square n)))
+  ([s total sample-size]
+   (mean-variance s h/square sample-size (mean s total)))
+  ([s sample-size]
+   (variance s (count s) sample-size))
+  ([s]
+   (variance s (count s))))
 
 (defn mean-cubed-variance
   [s]
   ((mean-variance s h/cube (count s))))
 
-; TODO: refactor this to take values, mean, and n to make it more composable
 (defn stddev
-  [s &{:keys [sample] :or {sample false}}]
-  (Math/sqrt (variance s :sample sample)))
+  ([s n]
+   (Math/sqrt (variance s n)))
+  ([s]
+   (stddev s (count s))))
 
-(def m2 (fn [s] (mean-variance s h/square (count s))))
-(def m3 (fn [s] (mean-variance s h/cube (count s))))
+(defn mN
+  "Generalized fn for computing m2 and m3."
+  ([f s total mean]
+   (mean-variance s f total mean))
+  ([f s total]
+   (mN f s total (mean s total)))
+  ([f s]
+   (mN f s (count s))))
+
+(def m2 (partial mN h/square))
+(def m3 (partial mN h/cube))
 
 (defn g1
   "Compute the g1 skewness coefficient given m2 and m3."
@@ -80,12 +103,13 @@
 
 (defn summary
   [s &{:keys [trim? p] :or {trim? false p 0.01}}]
-  (let [s (if trim? (trim s p) (sort s))]
+  (let [s (if trim? (trim s p) (sort s))
+        len (count s)]
     {:min (first s)
      :25th (d/percentile-w s 25 :sorted true)
      :median (median s :sorted true)
      :mean (float (mean s))
-     :stddev (stddev s :sample true)
+     :stddev (stddev s (- len 1))
      :75th (d/percentile-w s 75 :sorted true)
      :95th (d/percentile-w s 95 :sorted true)
      :max (last s)

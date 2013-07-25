@@ -12,7 +12,7 @@
 
 (facts :variance
        (stats/variance [0 1]) => 1/4
-       (stats/variance [0 1] :sample true) => 1/2
+       (stats/variance [0 1] 1) => 1/2
        (hist/pmf->variance (hist/pmf [0 1])) => 1/4)
 
 
