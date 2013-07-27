@@ -70,6 +70,11 @@
   [lambda]
   (/ 1.0 lambda))
 
+(defn expocdf
+  "Compute CDFexpo(x)."
+  [x lambda]
+  (- 1.0 (Math/exp (* -1 lambda x))))
+
 (defn erlangvariate
   "Generate random values from an Erlang distribution with rate parameter lambda
   and shape parameter k."
