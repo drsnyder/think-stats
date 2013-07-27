@@ -179,4 +179,5 @@
        :gp (stats/gp mean median stddev)
        :population-below-mean pop-below-mean
        :total total-reporting-taxes
-       :fraction-below-mean (/ pop-below-mean total-reporting-taxes)})))
+       :fraction-below-mean (/ pop-below-mean total-reporting-taxes)
+       :gini (/ (/ (stats/mean-difference pmf) mean) 2)})))

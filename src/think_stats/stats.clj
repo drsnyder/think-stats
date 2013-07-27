@@ -98,6 +98,29 @@
         std (stddev s)]
     (gp mean md std)))
 
+(defmulti mean-difference
+  "Compute the mean difference given a seq or a PMF. If a map is provided then
+  a PMF is assumed."
+  (fn [s & args]
+    (class s)))
+
+(defmethod mean-difference :types/map
+  [s & args]
+  (reduce +
+          (for [[xi xp :as x] (seq s)
+                [yi yp :as y] (seq s) :when (not= x y)]
+            (* xp yp (Math/abs (- xi yi))))))
+
+(defmethod mean-difference :types/seq
+  ([s n]
+   (/
+    (reduce +
+            (for [x s
+                  y s :when (not= x y)]
+              (Math/abs (- x y))))
+    (h/square n)))
+  ([s]
+   (mean-difference s (count s))))
 
 (declare trim)
 
