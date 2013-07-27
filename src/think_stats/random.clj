@@ -59,14 +59,6 @@
      (/ (Math/log (- 1.0 (rand)))
         (float lambda))))
 
-(defn erlangvariate
-  "Generate random values from an Erlang distribution with rate parameter lambda
-  and shape parameter k."
-  [lambda k]
-  (reduce + (repeatedly k #(expovariate lambda))))
-
-
-
 (defn expomedian
   "Compute the median of an exponential distribution with a given rate parameter lambda."
   [lambda]
@@ -77,6 +69,12 @@
   "Compute the mean of an exponential distribution with a given rate parameter lambda."
   [lambda]
   (/ 1.0 lambda))
+
+(defn erlangvariate
+  "Generate random values from an Erlang distribution with rate parameter lambda
+  and shape parameter k."
+  [lambda k]
+  (reduce + (repeatedly k #(expovariate lambda))))
 
 
 (defn create-gamma
@@ -150,3 +148,11 @@
       (- alpha 1)))
   ([alpha]
    (paretomean alpha 1)))
+
+(defn gumbelvariate
+  [mu beta]
+  (+ mu
+     (* beta
+        (Math/log (/ 1.0
+                     (Math/log (/ 1.0
+                                  (rand))))))))
