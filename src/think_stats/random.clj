@@ -55,7 +55,16 @@
   "Generate random values from an exponential distribution with rate parameter lambda.
   See http://en.wikipedia.org/wiki/Exponential_distribution generating exponential variates"
   [lambda]
-  (* -1.0 (/ (Math/log (- 1.0 (rand))) (float lambda))))
+  (* -1.0
+     (/ (Math/log (- 1.0 (rand)))
+        (float lambda))))
+
+(defn erlangvariate
+  "Generate random values from an Erlang distribution with rate parameter lambda
+  and shape parameter k."
+  [lambda k]
+  (reduce + (repeatedly k #(expovariate lambda))))
+
 
 
 (defn expomedian

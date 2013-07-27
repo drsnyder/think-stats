@@ -66,3 +66,8 @@
            (and
              (h/approxiately-equal median (random/paretomedian alpha x-min) 0.05)
              (h/approxiately-equal mean (random/paretomean alpha x-min) 0.05)) => true)))
+
+(facts :erlang :slow
+  (h/approxiately-equal
+    (stats/mean  (repeatedly 10000 #(random/erlangvariate 2 1)))
+    0.5) => true)
