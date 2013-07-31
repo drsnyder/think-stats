@@ -3,8 +3,7 @@
   (:require (think-stats
               [constants :as c]
               [util :as util]
-              [homeless :as h]))
-  (:import org.apache.commons.math3.special.Erf))
+              [homeless :as h])))
 
 
 (defn percentile
@@ -55,17 +54,3 @@
   (/
     (count (filter #(<= % x) s))
     (count s)))
-
-(defn normalcdf
-  "CDF for the normal distribution. mu is the mean and sigma is the standard deviation."
-  [mu sigma x]
-  (* 0.5 (+ 1
-            (Erf/erf (/ (- x mu)
-                        (* sigma c/sqrt2))))))
-
-(defn normalicdf
-  "ICDF for the normal distribution."
-  [mu sigma p]
-  (let [x (* c/sqrt2 (Erf/erfInv (- (* 2 p) 1)))]
-    (+ (* sigma x)
-       mu)))

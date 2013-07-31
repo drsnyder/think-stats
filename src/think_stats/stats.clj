@@ -3,6 +3,7 @@
               [util :as util]
               [types :as types]
               [distributions :as d]
+              [cdf :as cdf]
               [homeless :as h]))
   (:import org.apache.commons.math3.distribution.TDistribution))
 
@@ -184,7 +185,7 @@
   The standard normal distribution has μ = 0 (mu) and σ = 1 (sigma)."
   [z-score]
   (let [mu 0 sigma 1]
-    (d/normalcdf mu sigma z-score)))
+    (cdf/normalcdf mu sigma z-score)))
 
 (defn p-value
   "Compute the p value for a give z score. The p value is the probability of

@@ -4,6 +4,7 @@
               [constants :as c]
               [homeless :as h]
               [stats :as stats]
+              [cdf :as cdf]
               [util :as util]))
   (:import org.apache.commons.math3.special.Erf
            org.apache.commons.math3.distribution.BinomialDistribution
@@ -43,7 +44,7 @@
 (defn normalvariate
   "Generate random values from a normal distribution with mean mu and standard deviation sigma."
   [mu sigma]
-  (d/normalicdf mu sigma (- 1.0 (rand))))
+  (cdf/normalicdf mu sigma (- 1.0 (rand))))
 
 (defn lognormalvariate
   "Log normal distribution."
@@ -69,11 +70,6 @@
   "Compute the mean of an exponential distribution with a given rate parameter lambda."
   [lambda]
   (/ 1.0 lambda))
-
-(defn expocdf
-  "Compute CDFexpo(x)."
-  [x lambda]
-  (- 1.0 (Math/exp (* -1 lambda x))))
 
 (defn erlangvariate
   "Generate random values from an Erlang distribution with rate parameter lambda

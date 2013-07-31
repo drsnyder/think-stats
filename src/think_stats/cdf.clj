@@ -1,8 +1,10 @@
 (ns think-stats.cdf
   (:require (think-stats
+              [constants :as c]
               [homeless :as h]
               [hist :as hist]
-              [types :as types])))
+              [types :as types]))
+  (:import org.apache.commons.math3.special.Erf))
 
 (declare cdf cdf->value cdf->probability build-cdf-fn)
 
@@ -55,7 +57,7 @@
   (cond
     (< x (first kys)) 0
     (> x (last kys))  1
-    :else 
+    :else
     (let [kidx (h/bisect kys x :left)]
       (nth vls kidx))))
 
@@ -89,3 +91,31 @@
   [cdf n]
   (for [i (range n)]
     (cdf (rand) :value)))
+
+
+(defn cdf->probability-range
+  "Given a CDF compute the probability P(lower <= x <= upper)."
+  [cdf-fn lower upper]
+  (Math/abs (- (cdf-fn upper)
+               (cdf-fn lower))))
+
+(defn normalcdf
+  "CDF for the normal distribution. mu is the mean and sigma is the standard deviation."
+  [mu sigma x]
+  (* 0.5 (+ 1
+            (Erf/erf (/ (- x mu)
+                        (* sigma c/sqrt2))))))
+
+(defn normalicdf
+  "ICDF for the normal distribution."
+  [mu sigma p]
+  (let [x (* c/sqrt2 (Erf/erfInv (- (* 2 p) 1)))]
+    (+ (* sigma x)
+       mu)))
+
+(defn expocdf
+  "Compute CDFexpo(x)."
+  [lambda x]
+  (- 1.0 (Math/exp (* -1 lambda x))))
+
+
