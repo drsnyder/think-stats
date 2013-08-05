@@ -141,7 +141,7 @@
   "Bias a PMF (or unbias if invert is true). If the PMF is the distribution of reported values then
   any oversampling would be in proportion to the values. See the class size example. And the 3-size plot."
   [pmf &{:keys [invert] :or {invert false}}]
-  (let [transf (if invert 
+  (let [transf (if invert
                 (fn [k v] (* v (/ 1 k))) 
                 (fn [k v] (* v k)))
         t (into {} (for [[k v] pmf] [k (transf k v)]))]
@@ -150,3 +150,12 @@
 (defn pmf->unbiased
   [pmf]
   (pmf->biased pmf :invert true))
+
+
+(defn pmf+
+  "Given two PMFs x and y generate a new PMF z that is the sum of x and y."
+  [x y]
+  (assert (and (isa? (type y) :types/map)
+               (isa? (type x) :types/map)) "Both x and y must be maps.")
+  (hist->pmf (hist (for [xv (keys x) yv (keys y)]
+                     (+ xv yv)))))
