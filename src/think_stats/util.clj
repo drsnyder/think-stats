@@ -69,3 +69,10 @@
 (defn sum
   [s]
   (reduce + s))
+
+(defn filter-map
+  "Filter a map by the keys matching (f k)."
+  [m f]
+  (select-keys m (for [[k v] m
+                       :when (f k)]
+                   k)))

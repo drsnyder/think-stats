@@ -84,7 +84,7 @@
                :as params}]
   (let [[first-babies other-babies live] (map (comp hist/pmf stats/trim) (apply load-data data-file params))
         week-max (+ week-max 1)
-        generator (fn [data-set x] (get (hist/normalize-pmf (hist/filter-map data-set (set (range x week-max)))) x 0))
+        generator (fn [data-set x] (get (hist/normalize-pmf (util/filter-map data-set (set (range x week-max)))) x 0))
         x (prn "inside " first-babies)
         x (prn "gen " (generator first-babies 0))
         rows (for [x (range week-min week-max)]
@@ -104,9 +104,9 @@
   [data-file &{:keys [week-min week-max] :or {week-min 0 week-max 99} :as params}]
   (let [preg-data (util/read-file data-file :gunzip true)
         db (map (partial s/line->fields fields) preg-data)
-        predicate (fn [r] 
+        predicate (fn [r]
                     (when-let [len (get r "prglength")]
-                      (and 
+                      (and
                         (get r "birthord" nil)
                         (= (get r "outcome") 1) ; only live births
                         (>= len week-min)

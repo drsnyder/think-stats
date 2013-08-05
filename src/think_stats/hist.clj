@@ -127,14 +127,6 @@
             (filter #(binfn (pmf-entry->value %)) 
                     (seq pmf)))))
 
-
-
-(defn filter-map
-  "Filter a map by the keys matching (f k)."
-  [pmf f]
-  (select-keys pmf (for [[k v] pmf :when (f k)] k)))
-
-
 (defn normalize-pmf
   ([pmf fraction]
    (if (empty? pmf)
