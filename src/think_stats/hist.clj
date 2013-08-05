@@ -152,10 +152,18 @@
   (pmf->biased pmf :invert true))
 
 
-(defn pmf+
+(defn pmf+->pmf
   "Given two PMFs x and y generate a new PMF z that is the sum of x and y."
   [x y]
   (assert (and (isa? (type y) :types/map)
                (isa? (type x) :types/map)) "Both x and y must be maps.")
   (hist->pmf (hist (for [xv (keys x) yv (keys y)]
                      (+ xv yv)))))
+
+(defn pmf-max->pmf
+  "Given two PMFs x and y generate a new PMF z that is the max(x, y)."
+  [x y]
+  (assert (and (isa? (type y) :types/map)
+               (isa? (type x) :types/map)) "Both x and y must be maps.")
+  (hist->pmf (hist (for [xv (keys x) yv (keys y)]
+                     (max xv yv)))))
