@@ -15,4 +15,4 @@
                    :plugins [[lein-midje "3.0.0"]]
                    :dependencies [[org.clojure/tools.nrepl "0.2.3"]
                                   [org.clojure/tools.namespace "0.2.3"]]}}
-  :jvm-opts ["-Xmx512m" "-server"])
+  :jvm-opts ["-Xmx1G" "-server"])

@@ -24,6 +24,11 @@
   [n f]
   (repeatedly n f))
 
+(defn sum-samples
+  "Compute Z = X + Y given two functions X, and Y that generate random numbers."
+  [n X Y]
+  (repeatedly n #(+ (X) (Y))))
+
 (defn rankit-sample
   ([cdf]
    (into [] (sample rankit-items cdf)))

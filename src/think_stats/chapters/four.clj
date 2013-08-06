@@ -165,7 +165,6 @@
                                  (map second  (take-while
                                                 #(<=  (first %) mean)
                                                 (seq  h))))]
-      ; TODO: compute the skew and the gini coeff
       {:raw data
        :hist h
        :cdff cdff

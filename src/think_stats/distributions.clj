@@ -47,7 +47,6 @@
         idx (dec c)] ; zero offset
     (nth s idx)))
 
-
 (defn compute-cdf-value
   [s x]
   (assert (sequential? s) "Cannot compute the cdf on a non-seq data set.")
