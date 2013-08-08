@@ -51,10 +51,23 @@
   [mu sigma]
   (cdf/normalicdf mu sigma (- 1.0 (rand))))
 
+
 (defn lognormalvariate
   "Log normal distribution."
   [mu sigma]
   (Math/exp (normalvariate mu sigma)))
+
+(defn lognormalmean
+  [mu sigma]
+  (let [var (h/square sigma)]
+    (Math/exp (+ mu (/ var 2)))))
+
+(defn lognormalvariance
+  [mu sigma]
+  (let [var (h/square sigma)]
+    (*
+      (- (Math/exp var) 1)
+      (Math/exp (+ (* 2 mu) var)))))
 
 
 (defn expovariate
