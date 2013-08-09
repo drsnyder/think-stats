@@ -14,17 +14,18 @@
     (Float/parseFloat s)))
 
 
-(defn split-cmd 
+(defn split-cmd
     "Split a command string (e.g. \"Rscript plots/2.1.R in-data.csv\") into it's constituent parts for input to sh."
     [cmd]
     (if (string? cmd)
-          (clojure.string/split cmd #"\s+")
-          cmd))
+      ; Hack! remove the quotes on any quoted identifiers
+      (map #(clojure.string/replace % #"\"" "") (re-seq #"\"[\S\s]+\"|[\S]+" cmd))
+      cmd))
 
 (defn shell-exec
-    "Exec the given command on the shell."
-    [cmd]
-    (apply shell/sh (split-cmd cmd)))
+  "Exec the given command on the shell."
+  [cmd]
+  (apply shell/sh (split-cmd cmd)))
 
 (defn lazy-reader
   "Lazily read from fd."

@@ -44,12 +44,15 @@
         :to-plot \"plots/pareto-ccdf.png\")
 
   "
-  [x-vals y-vals &{:keys [r-script csv-out to-plot title] 
+  [x-vals y-vals &{:keys [r-script csv-out to-plot title]
                    :or {r-script "plots/line.R" csv-out "plots/line.csv"
                         to-plot "plots/line.png" title "line"}}]
   (let [header ["x" "y"]
         data   (map vector x-vals y-vals)
-        csv    (conj data header)]
+        csv    (conj data header)
+        cmd (format "Rscript %s %s \"%s\" %s" r-script csv-out title to-plot)]
     (util/write-to-csv csv-out csv)
-    (util/shell-exec (format "Rscript %s %s %s %s" r-script csv-out title to-plot))))
+    (let  [ret (util/shell-exec cmd)]
+      (when (not= (:exit ret) 0)
+        ret))))
 

@@ -30,17 +30,17 @@
   (repeatedly n #(+ (X) (Y))))
 
 (defn rankit-sample
-  ([cdf]
-   (into [] (sample rankit-items cdf)))
+  ([X]
+   (into [] (sample rankit-items X)))
   ([]
    (rankit-sample standard-normalvariate)))
 
 (defn rankit-samples
-  ([cdf n]
+  ([X n]
    (map stats/mean
         (apply map vector
                (map sort
-                    (repeatedly n #(rankit-sample cdf))))))
+                    (repeatedly n #(rankit-sample X))))))
   ([n]
    (rankit-samples standard-normalvariate n)))
 
