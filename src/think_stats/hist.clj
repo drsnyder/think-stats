@@ -124,7 +124,7 @@
   The resulting bins contain the sum of the frequencies that mapped to that bin."
   [pmf binfn]
   (util/sum (map pmf-entry->freq
-            (filter #(binfn (pmf-entry->value %)) 
+            (filter #(binfn (pmf-entry->value %))
                     (seq pmf)))))
 
 (defn normalize-pmf

@@ -19,9 +19,9 @@
 
 (defn percentile-rank
   [scores yours]
-  (* (/ 
-       (count (filter #(<= % yours) scores)) 
-       (count scores)) 
+  (* (/
+       (count (filter #(<= % yours) scores))
+       (count scores))
     100.0))
 
 (defn percentile-s

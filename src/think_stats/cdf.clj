@@ -26,7 +26,6 @@
         vls (vals m)]
     (build-cdf-fn kys vls)))
 
-; TODO: how do we know this is a hist?
 (defmethod cdff :types/map
   [h]
   (let [m (hist/hist->cdf h)
@@ -50,6 +49,18 @@
           (for [[r idx] (map vector s (range 1 (inc len)))
                 :let [y (/ idx len)]]
             [r y]))))
+
+(defn cdf->pmf
+  [cdf]
+  (assert (and (map? cdf) (sorted? cdf)) "CDF must be a sorted map.")
+  (let [ks (keys cdf)
+        vs (vals cdf)
+        out (sorted-map (first ks) (first vs))]
+    (into out
+         (for [[k t] (map vector
+                          (rest ks)
+                          (map (comp (partial apply -) reverse) (partition 2 1 vs)))]
+           [k t]))))
 
 
 (defn cdf->probability

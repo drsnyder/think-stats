@@ -8,8 +8,8 @@
 
 (defn sample-mean
   "Compute the mean of a sample of size n."
-  [n X]
-  (stats/mean (random/sample n X) n))
+  [n Z]
+  (stats/mean (random/sample n Z) n))
 
 (defn sample-mean-stats
   "Compute k means of samples of size n from random variable X."

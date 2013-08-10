@@ -14,6 +14,12 @@
          (get cdf 5) => 1
          (get cdf 6) => nil))
 
+(facts :cdf->pmf
+  (let [cdf (cdf/cdf (range 1 10))
+        pmf (cdf/cdf->pmf cdf)]
+    (get pmf 1) => 1/9
+    (get pmf 9) => 1/9))
+
 (facts :cddf
       (let [cdf (cdf/cdff (range 1 6))]
         (cdf 0)   => 0
