@@ -7,3 +7,4 @@
 (derive clojure.lang.PersistentVector :types/seq)
 (derive clojure.lang.PersistentList :types/seq)
 (derive clojure.lang.LazySeq :types/seq)
+(derive clojure.lang.ArraySeq :types/seq)

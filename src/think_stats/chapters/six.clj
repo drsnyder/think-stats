@@ -22,6 +22,7 @@
 (defn sample-mean-probability-plot
   "Generate normal probability plot for the given sample means.
   Example:
+  ; this takes a long time to converge
   (six/sample-mean-probability-plot
     (random/sample 1000
                    #(six/sample-mean (Math/pow 2 16)

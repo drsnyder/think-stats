@@ -98,8 +98,6 @@
     (util/shell-exec (format "Rscript %s %s %s" r-script csv-out to-plot))))
 
 
-
-
 (defn load-data
   [data-file &{:keys [week-min week-max] :or {week-min 0 week-max 99} :as params}]
   (let [preg-data (util/read-file data-file :gunzip true)
