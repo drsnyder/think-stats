@@ -29,8 +29,8 @@
 (defmethod cdff :types/map
   [h]
   (let [m (hist/hist->cdf h)
-        kys (keys m)
-        vls (vals m)]
+        kys (vec (keys m))
+        vls (vec (vals m))]
     (build-cdf-fn kys vls)))
 
 (defn build-cdf-fn
@@ -93,6 +93,7 @@
   [(cdf 0.25 :value) (cdf 0.5 :value) (cdf 0.75 :value)])
 
 
+; FIXME: the order of params is not consistent with random/sample
 (defn sample-cdf
   "Generate a lazy seq of values chosen at random from the given cdf. See cdff above.
 

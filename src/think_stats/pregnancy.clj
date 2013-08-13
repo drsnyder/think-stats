@@ -99,17 +99,19 @@
 
 
 (defn load-data
-  [data-file &{:keys [week-min week-max] :or {week-min 0 week-max 99} :as params}]
-  (let [preg-data (util/read-file data-file :gunzip true)
-        db (map (partial s/line->fields fields) preg-data)
-        predicate (fn [r]
-                    (when-let [len (get r "prglength")]
-                      (and
-                        (get r "birthord" nil)
-                        (= (get r "outcome") 1) ; only live births
-                        (>= len week-min)
-                        (<= len week-max))))
-        first-babies (for [r db :when (and (predicate r) (= (get r "birthord") 1))] (get r "prglength"))
-        other-babies (for [r db :when (and (predicate r) (not= (get r "birthord") 1))] (get r "prglength"))
-        live-births  (for [r db :when (and (predicate r) (= (get r "outcome") 1))] (get r "prglength"))]
-    [first-babies other-babies live-births]))
+  ([data-file &{:keys [week-min week-max column] :or {week-min 0 week-max 99 column "prglength"} :as params}]
+   (let [preg-data (util/read-file data-file :gunzip true)
+         db (map (partial s/line->fields fields) preg-data)
+         predicate (fn [r]
+                     (when-let [len (get r column)]
+                       (and
+                         (get r "birthord" nil)
+                         (= (get r "outcome") 1) ; only live births
+                         (>= len week-min)
+                         (<= len week-max))))
+         first-babies (for [r db :when (and (predicate r) (= (get r "birthord") 1))] (get r column))
+         other-babies (for [r db :when (and (predicate r) (not= (get r "birthord") 1))] (get r column))
+         live-births  (for [r db :when (and (predicate r) (= (get r "outcome") 1))] (get r column))]
+     [first-babies other-babies live-births]))
+  ([column]
+   (load-data "data/2002FemPreg.dat.gz" :column column)))

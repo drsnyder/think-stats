@@ -76,7 +76,7 @@
   When dir il :left find the insertion point idx in s such that all e (take idx x) satisfies e < x.
 
   Assumes that s is sorted."
-  [s x & [dir]] 
+  [s x & [dir]]
   (assert (sequential? s) "Cannot bisect a non-seq.")
   (loop [low 0 
          high (count s)]
