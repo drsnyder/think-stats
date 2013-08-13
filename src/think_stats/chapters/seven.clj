@@ -7,22 +7,20 @@
 (defn mean-difference
   "Helper function for reproducing the data in section 7.1 using."
   [edist-a edist-b n]
-  (let [pool (vec (shuffle (concat edist-a edist-b)))
+  (let [pool (vec (concat edist-a edist-b))
         size-a (count edist-a)
         size-b (count edist-b)
-        cdfa (cdf/cdff (repeatedly size-a #(rand-nth pool)))
-        cdfb (cdf/cdff (repeatedly size-b #(rand-nth pool)))
         mean-diff-edist (Math/abs (double (- (stats/mean edist-a) (stats/mean edist-b))))
         a-minus-b (repeatedly n
                               (fn []
-                                (let [sample-a (cdf/sample-cdf cdfa size-a)
-                                      sample-b (cdf/sample-cdf cdfb size-b)
+                                (let [sample-a (random/sample-seq size-a pool)
+                                      sample-b (random/sample-seq size-b pool)
                                       mean-diff-samples (double (- (stats/mean sample-a) (stats/mean sample-b)))]
                                   mean-diff-samples)))
-        outside-mean-diff (filter #(>= mean-diff-edist (Math/abs %)) a-minus-b)
+        outside-mean-diff (filter #(>= (Math/abs %) mean-diff-edist) a-minus-b)
         outside (count outside-mean-diff)]
    {:mean-difference mean-diff-edist
-    :outside (count outside-mean-diff)
+    :outside outside
     :p-value (double (/ outside n))}))
 
 (defn pregnancy-mean-difference

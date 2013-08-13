@@ -18,6 +18,10 @@
 
 (def rankit-items 6)
 
+(defn sample-seq
+  "Randomly select n items from s with replacement."
+  [n s]
+  (repeatedly n #(rand-nth s)))
 
 (defn sample
   "Sample f by calling it n times."
