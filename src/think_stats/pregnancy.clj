@@ -97,12 +97,25 @@
     (util/write-to-csv csv-out combined)
     (util/shell-exec (format "Rscript %s %s %s" r-script csv-out to-plot))))
 
+(defn recode
+  "Recode pregancy fields."
+  [r]
+  (cond-> r
+    (and (get r "birthwgt_lb")
+         (< (get r "birthwgt_lb") 20)
+         (get r "birthwgt_oz")
+         (< (get r "birthwgt_oz") 16)) (assoc "totalwgt_oz"
+                                              (+ (* (get r "birthwgt_lb") 16)
+                                                 (get r "birthwgt_oz")))))
 
+; FIXME: return the whole record not just the column. let another function filter out the column
 (defn load-data
   ([data-file &{:keys [week-min week-max column] :or {week-min 0 week-max 99 column "prglength"} :as params}]
    (let [preg-data (util/read-file data-file :gunzip true)
          db (map (partial s/line->fields fields) preg-data)
+         db (map recode db)
          predicate (fn [r]
+                     ; FIXME: this is only for prglength
                      (when-let [len (get r column)]
                        (and
                          (get r "birthord" nil)

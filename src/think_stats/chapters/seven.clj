@@ -18,10 +18,17 @@
                                       mean-diff-samples (double (- (stats/mean sample-a) (stats/mean sample-b)))]
                                   mean-diff-samples)))
         outside-mean-diff (filter #(>= (Math/abs %) mean-diff-edist) a-minus-b)
-        outside (count outside-mean-diff)]
+        outside (count outside-mean-diff)
+        cdf (cdf/cdff a-minus-b)
+        left (cdf (* -1 mean-diff-edist))
+        right (- 1 (cdf mean-diff-edist))
+        p-value (+ left right)]
    {:mean-difference mean-diff-edist
     :outside outside
-    :p-value (double (/ outside n))}))
+    :p-value-from-ratio (double (/ outside n))
+    :left-p-value (double left)
+    :right-p-value (double right)
+    :p-value (double p-value)}))
 
 (defn pregnancy-mean-difference
   [column n]
