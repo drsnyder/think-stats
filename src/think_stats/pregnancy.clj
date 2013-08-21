@@ -115,9 +115,10 @@
          db (map (partial s/line->fields fields) preg-data)
          db (map recode db)
          predicate (fn [r]
-                     ; FIXME: this is only for prglength
-                     (when-let [len (get r column)]
+                     ; we only want to process records that fall within what we believe are valid weeks
+                     (when-let [len (get r "prglength")]
                        (and
+                         (get r column)
                          (get r "birthord" nil)
                          (= (get r "outcome") 1) ; only live births
                          (>= len week-min)

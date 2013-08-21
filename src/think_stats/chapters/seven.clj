@@ -10,12 +10,16 @@
   (let [pool (vec (concat edist-a edist-b))
         size-a (count edist-a)
         size-b (count edist-b)
-        mean-diff-edist (Math/abs (double (- (stats/mean edist-a) (stats/mean edist-b))))
+        mean-diff-edist (Math/abs (double (-
+                                           (stats/mean edist-a)
+                                           (stats/mean edist-b))))
         a-minus-b (repeatedly n
                               (fn []
                                 (let [sample-a (random/sample-seq size-a pool)
                                       sample-b (random/sample-seq size-b pool)
-                                      mean-diff-samples (double (- (stats/mean sample-a) (stats/mean sample-b)))]
+                                      mean-diff-samples (double (-
+                                                                 (stats/mean sample-a)
+                                                                 (stats/mean sample-b)))]
                                   mean-diff-samples)))
         outside-mean-diff (filter #(>= (Math/abs %) mean-diff-edist) a-minus-b)
         outside (count outside-mean-diff)
