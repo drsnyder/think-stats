@@ -23,13 +23,9 @@
   (rand-int num-doors))
 
 (defn remove-door
-  "Monty uses this to remove a door"
+  "Monty uses this to remove a door."
   [door doors]
-  (assert (>= (count doors) 3) "remove-door assumes 3 or more doors")
-  (condp = door
-    0 (subvec doors 1 number-doors)
-    number-doors (subvec doors 0 (dec number-doors))
-    (vec (concat (subvec doors 0 door) (subvec doors (inc door) number-doors)))))
+  (h/dissoc-vec doors door))
 
 (defn montys-pick-leaves
   "Pick the door that doesn't have the car."

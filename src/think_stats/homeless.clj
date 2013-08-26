@@ -109,3 +109,14 @@
   [n]
   (assert (number? n) (str "Error numeric-complement: " (type n) " is not a number."))
   (- 1 n))
+
+(defn dissoc-vec
+  "dissoc index i from vector v."
+  [v i]
+  (let [c (count v)]
+    (assert (vector? v) "Can only dissoc-vec on a vector.")
+    (assert (and (>= i 0) (< i c)) "Vector index out of bounds.")
+    (cond
+      (= i 0) (subvec v 1)
+      (= i (- c 1)) (subvec v 0 i)
+      :else (into (subvec v 0 i) (subvec v (inc i))))))
