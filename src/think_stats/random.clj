@@ -19,8 +19,15 @@
 (def rankit-items 6)
 
 (defn sample-seq
+  "Randomly select n items from s without replacement."
+  [n s]
+  (assert (sequential? s) "Error, cannot sample without replacement a non-seq.")
+  (take n (shuffle s)))
+
+(defn choice-seq
   "Randomly select n items from s with replacement."
   [n s]
+  (assert (sequential? s) "Error, cannot sample with replacement a non-seq.")
   (repeatedly n #(rand-nth s)))
 
 (defn sample

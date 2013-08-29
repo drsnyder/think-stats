@@ -15,8 +15,8 @@
                                            (stats/mean edist-b))))
         a-minus-b (repeatedly n
                               (fn []
-                                (let [sample-a (random/sample-seq size-a pool)
-                                      sample-b (random/sample-seq size-b pool)
+                                (let [sample-a (random/choice-seq size-a pool)
+                                      sample-b (random/choice-seq size-b pool)
                                       mean-diff-samples (double (-
                                                                  (stats/mean sample-a)
                                                                  (stats/mean sample-b)))]
@@ -35,8 +35,14 @@
     :p-value (double p-value)}))
 
 (defn pregnancy-mean-difference
-  [column n]
+  [column n &{:keys [sample-size] :or [sample-size nil]}]
   (let [[first-babies other all] (preg/load-data column)
+        first-babies (if sample-size
+                       (random/sample-seq sample-size first-babies)
+                       first-babies)
+        other (if sample-size
+                (random/sample-seq sample-size other)
+                other)
         stats (mean-difference first-babies other n)]
     stats))
 
