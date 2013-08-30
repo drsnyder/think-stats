@@ -67,7 +67,6 @@
   [kys vls x]
   (cond
     (< x (first kys)) 0
-    (> x (last kys))  1
     :else
     (let [kidx (h/bisect kys x :left)]
       (nth vls kidx))))

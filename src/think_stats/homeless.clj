@@ -78,8 +78,8 @@
   Assumes that s is sorted."
   [s x & [dir]]
   (assert (sequential? s) "Cannot bisect a non-seq.")
-  (loop [low 0 
-         high (count s)]
+  (loop [low 0
+         high (dec (count s))]
     (if (>= low high)
       low
       (let [mid (quot (+ low high) 2)

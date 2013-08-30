@@ -14,8 +14,8 @@
        (h/bisect (range 0 10) 2 :right) => 3
        (h/bisect (range 0 10) 2 :left) => 2
 
-       (h/bisect (range 0 10) 10 :right) => 10
-       (h/bisect (range 0 10) 10 :left) => 10)
+       (h/bisect (range 0 10) 10 :right) => 9
+       (h/bisect (range 0 10) 10 :left) => 9)
 
 (facts :dissoc-vec
   (let [v [1 2 3]]
