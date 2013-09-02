@@ -4,6 +4,11 @@
                          [cdf :as cdf]
                          [random :as random])))
 
+(defn random-partition
+  [s n]
+  (let [rs (shuffle s)]
+    [(take n rs) (drop n rs)]))
+
 (defn mean-difference
   "Returns [meana meanb difference]"
   [colla collb]
@@ -24,10 +29,9 @@
                         mean-diff-samples)))
         mean-of-means (stats/mean mean-delta-dist)
         var-of-means (stats/variance mean-delta-dist)
-        j (prn (format "mean %2.5f var %2.5f of resampled deltas" mean-of-means var-of-means))
+        j (prn (format "delta: %f mean %2.5f var %2.5f of resampled deltas" delta mean-of-means var-of-means))
         outside-mean-diff (filter #(>= (Math/abs %) (Math/abs delta)) mean-delta-dist)
         outside (count outside-mean-diff)
-        j (prn (format "min %f max %f" (apply min mean-delta-dist) (apply max mean-delta-dist)))
         cdf (cdf/cdff mean-delta-dist)
         left (cdf (* -1 delta))
         right (- 1 (cdf delta))
@@ -41,43 +45,49 @@
 
 (defn mean-difference-sim
   "Helper function for reproducing the data in section 7.1"
-  [edist-a edist-b n]
-  (let [pool (vec (concat edist-a edist-b))
-        edist-a (vec edist-a)
-        edist-b (vec edist-b)
+  [pool edist-a edist-b iter &{:keys [partition-dist] :or {partition-dist false}}]
+  (let [pool (vec pool)
         size-a (count edist-a)
         size-b (count edist-b)
-        [meana meanb mean-diff-edist] (mean-difference edist-a edist-b)
-
-        j (prn (format "delta %f" mean-diff-edist))
+        [edist-a model-a] (if partition-dist
+                            (random-partition edist-a size-a)
+                            [edist-a edist-a])
+        [edist-b model-b] (if partition-dist
+                            (random-partition edist-b size-b)
+                            [edist-b edist-b])
+        [edist-a edist-b model-a model-b] (map vec (list edist-a edist-b model-a model-b))
+        mean (stats/mean pool)
+        var (stats/variance pool)
+        j (println (format "Mean %f var %f of pooled data." (double mean) (double var)))
+        [meana meanb delta] (mean-difference edist-a edist-b)
+        j (println (format "Mean a %f mean b %f delta %f" (double meana) (double meanb) delta))
         ; the probability that the effect is real given the null hypothesis. we compute this by randomly
         ; sampling from the entire distribution (pool); X = (random/choice-seq pool size-a)
         ; Y = (random/choice-seq pool size-b)
-        peh0 (mean-difference-p-value mean-diff-edist pool size-a pool size-b n)
+        peh0 (mean-difference-p-value delta pool size-a pool size-b iter)
         j (prn "calculated peh0")
         ; the probability that the effect is real given the hypothesis about the value. we compute this
         ; by randomly sampling X and Y from the data representing X and Y; X = (random/choice-seq edist-a size-a)
         ; Y = (random/choice-seq edist-b size-b)
-        peha (mean-difference-p-value mean-diff-edist edist-a size-a edist-b size-b n)
-        j (prn "calculated peha")
-        ]
+        peha (mean-difference-p-value delta edist-a size-a edist-b size-b iter)
+        j (prn "calculated peha")]
     {:peh0 peh0
      :peha peha}))
 
+(comment (seven/pregnancy-mean-difference "totalwgt_oz" 1000))
+
+; TODO: support partitioning the data
 (defn pregnancy-mean-difference
   ; pha = prior
-  [column n &{:keys [sample-size pha] :or {sample-size nil pha 0.5}}]
+  [column n &{:keys [sample-size pha partition-dist] :or {sample-size nil pha 0.5 partition-dist false}}]
   (let [[first-babies other all] (preg/load-data column)
-        mean (stats/mean all)
-        var (stats/variance all)
-        j (println (format "Mean %f var %f for %s of pooled data." (double mean) (double var) column))
         first-babies (if sample-size
                        (random/sample-seq sample-size first-babies)
                        first-babies)
         other (if sample-size
                 (random/sample-seq sample-size other)
                 other)
-        stats (mean-difference-sim first-babies other n)
+        stats (mean-difference-sim all first-babies other n :partition-dist partition-dist)
         peha (get-in stats [:peha :p-value])
         peh0 (get-in stats [:peh0 :p-value])
         ; P(E) = P(E|Ha) * P(Ha) + P(E|H0) * P(H0)
