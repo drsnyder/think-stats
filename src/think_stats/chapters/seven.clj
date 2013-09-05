@@ -46,15 +46,17 @@
 (defn mean-difference-sim
   "Helper function for reproducing the data in section 7.1"
   [pool edist-a edist-b iter &{:keys [partition-dist] :or {partition-dist false}}]
-  (let [pool (vec pool)
-        size-a (count edist-a)
+  (let [size-a (count edist-a)
         size-b (count edist-b)
         [edist-a model-a] (if partition-dist
-                            (random-partition edist-a size-a)
+                            (random-partition edist-a (/ size-a 2))
                             [edist-a edist-a])
         [edist-b model-b] (if partition-dist
-                            (random-partition edist-b size-b)
+                            (random-partition edist-b (/ size-b 2))
                             [edist-b edist-b])
+        pool (if partition-dist
+               (vec (concat model-a model-b))
+               (vec pool))
         [edist-a edist-b model-a model-b] (map vec (list edist-a edist-b model-a model-b))
         mean (stats/mean pool)
         var (stats/variance pool)
@@ -69,7 +71,7 @@
         ; the probability that the effect is real given the hypothesis about the value. we compute this
         ; by randomly sampling X and Y from the data representing X and Y; X = (random/choice-seq edist-a size-a)
         ; Y = (random/choice-seq edist-b size-b)
-        peha (mean-difference-p-value delta edist-a size-a edist-b size-b iter)
+        peha (mean-difference-p-value delta model-a (count model-a) model-b (count model-b) iter)
         j (prn "calculated peha")]
     {:peh0 peh0
      :peha peha}))
