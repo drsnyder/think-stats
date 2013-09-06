@@ -20,7 +20,7 @@
    (range 40 45) 3
    (range 45 50) 2})
 
-(def total-classes (util/sum (vals sizes)))
+(def total-classes (h/sum (vals sizes)))
 
 (def sizes-pmf (into {} (for [[k v] sizes] [(stats/mean k) (/ v total-classes)])))
 

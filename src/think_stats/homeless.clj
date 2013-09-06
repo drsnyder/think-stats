@@ -1,6 +1,17 @@
 (ns think-stats.homeless
   (:require (think-stats [util :as util])))
 
+(defn sum
+  [s]
+  (reduce + s))
+
+
+(defn filter-map
+  "Filter a map by the keys matching (f k)."
+  [m f]
+  (select-keys m (for [[k v] m
+                       :when (f k)]
+                   k)))
 
 (defn map-map
   [f m &{:keys [dest] :or {dest {}}}]

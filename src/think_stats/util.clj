@@ -41,7 +41,7 @@
                          gunzip (java.util.zip.GZIPInputStream.)
                          true (io/reader))))
 
-(defn write-to-csv 
+(defn write-to-csv
   "Write the simulation data to the given file."
   [file data & opts]
   (let [writer (if opts (apply io/writer file opts) (io/writer file))]
@@ -66,14 +66,3 @@
           (empty? l) nil
           (= (first l) e) (recur (rest l) (inc c))
           :else (recur (rest l) 0))))
-
-(defn sum
-  [s]
-  (reduce + s))
-
-(defn filter-map
-  "Filter a map by the keys matching (f k)."
-  [m f]
-  (select-keys m (for [[k v] m
-                       :when (f k)]
-                   k)))

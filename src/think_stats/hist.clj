@@ -40,7 +40,7 @@
   "Compute the CDF of a histogram."
   [h]
   (assert (map? h) "Cannot compute the CDF of a histogram on a non-map.")
-  (let [total (util/sum (vals h))]
+  (let [total (h/sum (vals h))]
     (into (sorted-map) (for [[i v] (map vector (keys h) (reductions + (vals h)))]
                          [i (/ v total)]))))
 
@@ -101,7 +101,7 @@
 
 (defn pmf->mean
   [pmf]
-  (util/sum
+  (h/sum
     (map #(* (pmf-entry->value %)
             (pmf-entry->freq %))
          (seq pmf))))
@@ -109,7 +109,7 @@
 (defn pmf->variance
   [pmf]
   (let [m (pmf->mean pmf)]
-    (util/sum
+    (h/sum
       (map #(* (pmf-entry->freq %)
               (h/square (- (pmf-entry->value %) m)))
            pmf))))
@@ -123,7 +123,7 @@
   "Bin PMF values by applying binfn to each value in the PMF.
   The resulting bins contain the sum of the frequencies that mapped to that bin."
   [pmf binfn]
-  (util/sum (map pmf-entry->freq
+  (h/sum (map pmf-entry->freq
             (filter #(binfn (pmf-entry->value %))
                     (seq pmf)))))
 
@@ -131,7 +131,7 @@
   ([pmf fraction]
    (if (empty? pmf)
      pmf
-     (let [factor (/ fraction (util/sum (vals pmf)))]
+     (let [factor (/ fraction (h/sum (vals pmf)))]
        (into {} (for [[k v] pmf] [k (* v factor)])))))
   ([pmf]
    (normalize-pmf pmf 1.0)))

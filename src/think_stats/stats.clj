@@ -13,7 +13,7 @@
    (assert (sequential? s) "Cannot compute the mean on a non-seq.")
    (if (empty? s)
      nil
-     (/ (util/sum s)
+     (/ (h/sum s)
         n)))
   ([s]
    (mean s (count s))))
@@ -31,14 +31,14 @@
 
 (defmethod mean-variance :types/seq
   [s f n m]
-  (/ (util/sum (map #(f (- % m)) s))
+  (/ (h/sum (map #(f (- % m)) s))
      n))
 
 (defmethod mean-variance :types/map
   [s f n m]
   ; when we have a map we are working with a histogram. in this case, multiply
   ; each mean difference (key) by the weight (value)
-  (/ (util/sum (map #(* (f (- (first %) m)) (second %)) (seq s)))
+  (/ (h/sum (map #(* (f (- (first %) m)) (second %)) (seq s)))
      n))
 
 (defn variance

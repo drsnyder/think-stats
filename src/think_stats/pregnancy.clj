@@ -1,6 +1,7 @@
 (ns think-stats.pregnancy
   (:require (think-stats
               [util :as util]
+              [homeless :as h]
               [hist :as hist]
               [stats :as stats]
               [survey :as s])))
@@ -84,7 +85,7 @@
                :as params}]
   (let [[first-babies other-babies live] (map (comp hist/pmf stats/trim) (apply load-data data-file params))
         week-max (+ week-max 1)
-        generator (fn [data-set x] (get (hist/normalize-pmf (util/filter-map data-set (set (range x week-max)))) x 0))
+        generator (fn [data-set x] (get (hist/normalize-pmf (h/filter-map data-set (set (range x week-max)))) x 0))
         x (prn "inside " first-babies)
         x (prn "gen " (generator first-babies 0))
         rows (for [x (range week-min week-max)]
