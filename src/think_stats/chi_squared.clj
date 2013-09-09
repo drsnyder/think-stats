@@ -6,7 +6,7 @@
   (:import org.apache.commons.math3.distribution.ChiSquaredDistribution))
 
 (defn chi-squared-statistic
-  [observed expected]
+  [expected observed]
   (assert (and (sequential? observed)
                (sequential? expected))
           "Error, the test statistic can only be computed on sequentials.")
@@ -16,12 +16,19 @@
     (h/sum (for [[o e] pairs]
              (/ (h/square (- o e)) e)))))
 
-(defn create-chi-squared
+(defn create-chi-squared-cdf
   [dof]
   (ChiSquaredDistribution. dof))
 
-(def chi-squared (memoize create-chi-squared))
+(def chi-squared-cdf (memoize create-chi-squared-cdf))
 
 (defn p-value
   [dof x]
-  (- 1.0 (.cumulativeProbability (chi-squared dof) x)))
+  (- 1.0 (.cumulativeProbability (chi-squared-cdf dof) x)))
+
+(defn chi-squared
+  [dof expected observed]
+  (let [X (double (chi-squared-statistic observed expected))
+        p-value (p-value dof X)]
+    {:X X
+     :p-value p-value}))

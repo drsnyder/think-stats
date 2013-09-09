@@ -186,3 +186,10 @@
         (Math/log (/ 1.0
                      (Math/log (/ 1.0
                                   (rand))))))))
+
+(defn fair-dice
+  "Simulate a fair dice. Defaults to 6 sides."
+  ([n]
+   (inc (rand-int n)))
+  ([]
+   (fair-dice 6)))

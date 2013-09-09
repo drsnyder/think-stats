@@ -2,7 +2,9 @@
   (:require (think-stats [pregnancy :as preg]
                          [stats :as stats]
                          [cdf :as cdf]
-                         [random :as random])))
+                         [hist :as hist]
+                         [random :as random]
+                         [chi-squared :as chi-squared])))
 
 (defn random-partition
   [s n]
@@ -78,7 +80,6 @@
 
 (comment (seven/pregnancy-mean-difference "totalwgt_oz" 1000))
 
-; TODO: support partitioning the data
 (defn pregnancy-mean-difference
   ; pha = prior
   [column n &{:keys [sample-size pha partition-dist] :or {sample-size nil pha 0.5 partition-dist false}}]
@@ -99,3 +100,17 @@
     {:raw stats
      :posterior posterior}))
 
+
+
+
+(defn dice-chi-squared-monte-carlo
+  ; FIXME: make this more general
+  "This is instructive, but unnecessary since the CDF of chi-squared distribution can be computed for any x
+  to determine P(X <= x). It's interesting to run the simulation and see that it matches up with the continuous CDF."
+  [dice-rolls horizon]
+  (let  [sides 6
+         dice #(random/fair-dice sides)
+         expected (take sides (cycle [(* (/ 1 sides) dice-rolls)]))
+         default (apply sorted-map (interleave  (range 1 sides)  (take sides  (cycle  [0]))))
+         observations (map vals (map #(hist/hist % :dest default) (repeatedly horizon #(repeatedly dice-rolls dice))))]
+    (map (comp double (partial chi-squared/chi-squared-statistic expected)) observations)))
