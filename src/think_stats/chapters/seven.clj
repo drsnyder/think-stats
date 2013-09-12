@@ -18,19 +18,22 @@
         meanb (stats/mean collb)]
     [meana meanb (double (- meana meanb))]))
 
-
-(defn mean-difference-p-value
-  [delta edist-a size-a edist-b size-b n]
-  (let [delta (Math/abs delta)
-        mean-delta-dist
+(defn sample->mean-delta-dist
+  "Returns [mean-of-means variance-of-means distribution]."
+  [n edist-a size-a edist-b size-b]
+  (let [mean-delta-dist
         (repeatedly n
                     (fn []
                       (let [sample-a (random/choice-seq size-a edist-a)
                             sample-b (random/choice-seq size-b edist-b)
                             [ma mb mean-diff-samples] (mean-difference sample-a sample-b)]
-                        mean-diff-samples)))
-        mean-of-means (stats/mean mean-delta-dist)
-        var-of-means (stats/variance mean-delta-dist)
+                        mean-diff-samples)))]
+    [(stats/mean mean-delta-dist) (stats/variance mean-delta-dist) mean-delta-dist]))
+
+(defn mean-difference-p-value
+  [delta edist-a size-a edist-b size-b n]
+  (let [delta (Math/abs delta)
+        [mean-of-means var-of-means mean-delta-dist] (sample->mean-delta-dist n edist-a size-a edist-b size-b)
         j (prn (format "delta: %f mean %2.5f var %2.5f of resampled deltas" delta mean-of-means var-of-means))
         outside-mean-diff (filter #(>= (Math/abs %) (Math/abs delta)) mean-delta-dist)
         outside (count outside-mean-diff)
@@ -93,6 +96,7 @@
         stats (mean-difference-sim all first-babies other n :partition-dist partition-dist)
         peha (get-in stats [:peha :p-value])
         peh0 (get-in stats [:peh0 :p-value])
+        j (prn (format "peha p-value %f" peh0))
         ; P(E) = P(E|Ha) * P(Ha) + P(E|H0) * P(H0)
         ; P(H0) = 1.0 - P(Ha)
         pe (+ (* peha pha) (* peh0 (- 1.0 pha))) ; pha is the prior
@@ -100,6 +104,17 @@
     {:raw stats
      :posterior posterior}))
 
+
+(defn pregnancy-power
+  [column sample-size alpha]
+  (let [[first-babies other all] (preg/load-data column)
+        [mean-a mean-b delta] (mean-difference first-babies other)
+        [mean-of-means var-of-means mean-delta-dist] (sample->mean-delta-dist sample-size (vec first-babies) (count first-babies) (vec other) (count other))
+        ; assuming the difference is really what we calculated, compute the difference that would be required to satisfy an alpha
+        ; less than or equal to the alpha value given
+        j (prn delta)
+        p-value (mean-difference-p-value delta (vec all) (count first-babies) (vec all) (count other) sample-size)]
+    [delta p-value]))
 
 
 
