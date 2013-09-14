@@ -106,15 +106,38 @@
 
 
 (defn pregnancy-power
-  [column sample-size alpha]
+  "Compute the power of a difference in mean hypothesis test for a pregnancy value between first born babies
+  and other babies."
+  [column sample-size alpha & {:keys []}]
   (let [[first-babies other all] (preg/load-data column)
         [mean-a mean-b delta] (mean-difference first-babies other)
-        [mean-of-means var-of-means mean-delta-dist] (sample->mean-delta-dist sample-size (vec first-babies) (count first-babies) (vec other) (count other))
-        ; assuming the difference is really what we calculated, compute the difference that would be required to satisfy an alpha
-        ; less than or equal to the alpha value given
-        j (prn delta)
-        p-value (mean-difference-p-value delta (vec all) (count first-babies) (vec all) (count other) sample-size)]
-    [delta p-value]))
+        ; this may be bogus because we are using the variance from the same data set
+        [mean-of-means var-of-means mean-delta-dist]
+        (sample->mean-delta-dist sample-size
+                                 (vec first-babies)
+                                 (count first-babies)
+                                 (vec other)
+                                 (count other))
+        ; compute the threshold-- values outside the threshold on a sample would result in rejecting the null
+        ; hypothesis.
+        threshold (cdf/normalicdf 0 (Math/sqrt var-of-means) (- 1.0 alpha))
+        outside-mean-diff (filter #(>= (Math/abs %) threshold) mean-delta-dist)
+        var-first (stats/variance first-babies)
+        var-other (stats/variance other)]
+    {:count-first (count first-babies)
+     :count-other (count other)
+     :mean-first (double mean-a)
+     :var-first var-first
+     :se-first (Math/sqrt (/ var-first (count first-babies)))
+     :mean-other (double mean-b)
+     :var-other var-other
+     :se-other (Math/sqrt (/ var-other (count other)))
+     :se (Math/sqrt (+ (/ var-first (count first-babies)) (/ var-other (count other))))
+     :mean-of-means mean-of-means
+     :var-of-means var-of-means
+     :delta delta
+     :threshold threshold
+     :power (double (/ (count outside-mean-diff) sample-size)) }))
 
 
 
