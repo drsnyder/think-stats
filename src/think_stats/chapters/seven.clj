@@ -107,7 +107,9 @@
 
 (defn pregnancy-power
   "Compute the power of a difference in mean hypothesis test for a pregnancy value between first born babies
-  and other babies."
+  and other babies.
+
+  See also R/7.7.R. The result isn't exactly the same because a model is used, but it's close."
   [column sample-size alpha & {:keys []}]
   (let [[first-babies other all] (preg/load-data column)
         [mean-a mean-b delta] (mean-difference first-babies other)
@@ -121,21 +123,8 @@
         ; compute the threshold-- values outside the threshold on a sample would result in rejecting the null
         ; hypothesis.
         threshold (cdf/normalicdf 0 (Math/sqrt var-of-means) (- 1.0 alpha))
-        outside-mean-diff (filter #(>= (Math/abs %) threshold) mean-delta-dist)
-        var-first (stats/variance first-babies)
-        var-other (stats/variance other)]
-    {:count-first (count first-babies)
-     :count-other (count other)
-     :mean-first (double mean-a)
-     :var-first var-first
-     :se-first (Math/sqrt (/ var-first (count first-babies)))
-     :mean-other (double mean-b)
-     :var-other var-other
-     :se-other (Math/sqrt (/ var-other (count other)))
-     :se (Math/sqrt (+ (/ var-first (count first-babies)) (/ var-other (count other))))
-     :mean-of-means mean-of-means
-     :var-of-means var-of-means
-     :delta delta
+        outside-mean-diff (filter #(>= (Math/abs %) threshold) mean-delta-dist) ]
+    {:delta delta
      :threshold threshold
      :power (double (/ (count outside-mean-diff) sample-size)) }))
 
