@@ -18,9 +18,21 @@
   ([s]
    (mean s (count s))))
 
-(defn median
+(defn percentile-median
   [s &{:keys [sorted] :or {sorted false}}]
   (d/percentile-w s 50 :sorted sorted))
+
+(defn median
+  [s &{:keys [sorted] :or {sorted false}}]
+  (let [n (count s)
+        s (if (not sorted) (sort s) s)]
+    (assert (> n 0))
+    (cond
+      (even? n) (let [upper-idx (/ n 2)
+                      lower-idx (dec upper-idx)
+                      {upper upper-idx lower lower-idx} (vec s)]
+                  (/ (+ upper lower) 2))
+      :else (nth s (quot n 2)))))
 
 
 (defmulti mean-variance
@@ -230,3 +242,10 @@
   [dof alpha &{:keys [two-tailed] :or {two-tailed true}}]
   (let [p (if two-tailed (/ alpha 2.0) alpha)]
     (Math/abs (.inverseCumulativeProbability (t-distribution dof) p))))
+
+(defn mean-squared-error
+  "Compute the mean squared error given an estimator (typically the population mean)."
+  ([estimator mean-coll m]
+   (/ (h/sum (map #(h/square (- % estimator)) mean-coll)) m))
+  ([estimator mean-coll]
+   (mean-squared-error estimator mean-coll (count mean-coll))))
