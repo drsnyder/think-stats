@@ -243,9 +243,24 @@
   (let [p (if two-tailed (/ alpha 2.0) alpha)]
     (Math/abs (.inverseCumulativeProbability (t-distribution dof) p))))
 
+
+(comment
+  (def sample  (repeatedly 1000 random/rankit-sample))
+  (stats/mean-squared-error 0  (map stats/mean sample) 1000))
+
+(defn mean-error
+  "Compute the mean error given an exstimator and a collection."
+  ([estimator mean-coll m f]
+   (/ (h/sum (map #(f (- % estimator)) mean-coll)) m))
+  ([estimator mean-coll m]
+   (mean-error estimator mean-coll m identity))
+  ([estimator mean-coll]
+   (mean-error estimator mean-coll (count mean-coll))))
+
+
 (defn mean-squared-error
   "Compute the mean squared error given an estimator (typically the population mean)."
   ([estimator mean-coll m]
-   (/ (h/sum (map #(h/square (- % estimator)) mean-coll)) m))
+   (mean-error estimator mean-coll m h/square))
   ([estimator mean-coll]
-   (mean-squared-error estimator mean-coll (count mean-coll))))
+   (mean-squared-error estimator mean-coll (count mean-coll) h/square)))
