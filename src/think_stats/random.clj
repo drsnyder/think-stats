@@ -5,7 +5,8 @@
               [homeless :as h]
               [stats :as stats]
               [cdf :as cdf]
-              [util :as util]))
+              [util :as util]
+              [chi-squared :as chi-squared]))
   (:import org.apache.commons.math3.special.Erf
            org.apache.commons.math3.distribution.BinomialDistribution
            org.apache.commons.math3.distribution.GammaDistribution))
@@ -99,6 +100,19 @@
   "Compute the mean of an exponential distribution with a given rate parameter lambda."
   [lambda]
   (/ 1.0 lambda))
+
+(defn expopdf
+  "Compute the PDF of the exponential distrubution with lambda at x."
+  [lambda x]
+  (* lambda (Math/exp (* (* -1 lambda) x))))
+
+(defn expo-interval
+  [sample alpha]
+  (let [n (count sample)
+        n2 (* 2 n)
+        estimator (/ 1.0 (stats/mean sample n))]
+    [(* estimator (/ (chi-squared/cdf n2 (- 1 (/ alpha 2.0))) n2))
+     (* estimator (/ (chi-squared/cdf n2 (/ alpha 2.0)) n2))]))
 
 (defn erlangvariate
   "Generate random values from an Erlang distribution with rate parameter lambda

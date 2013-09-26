@@ -51,6 +51,7 @@
             [r y]))))
 
 (defn cdf->pmf
+  "Convert a CDF to a PMF."
   [cdf]
   (assert (and (map? cdf) (sorted? cdf)) "CDF must be a sorted map.")
   (let [ks (keys cdf)
@@ -61,6 +62,16 @@
                           (rest ks)
                           (map (comp (partial apply -) reverse) (partition 2 1 vs)))]
            [k t]))))
+
+
+(defn pmf->cdf
+  "Convert a PMF to a CDF."
+  [pmf]
+  (assert (map? cdf) "PMF must be a map.")
+  (into (sorted-map-by (fn [k1 k2]
+                         (compare (get pmf k1)
+                                  (get pmf k2))))
+        pmf))
 
 
 (defn cdf->probability

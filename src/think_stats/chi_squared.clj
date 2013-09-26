@@ -16,15 +16,20 @@
     (h/sum (for [[o e] pairs]
              (/ (h/square (- o e)) e)))))
 
-(defn create-chi-squared-cdf
+(defn create-chi-squared
   [dof]
   (ChiSquaredDistribution. dof))
 
-(def chi-squared-cdf (memoize create-chi-squared-cdf))
+(def chi-squared-dist (memoize create-chi-squared))
+
+(defn cdf
+  [dof x]
+  (.cumulativeProbability (chi-squared-dist dof) x))
 
 (defn p-value
   [dof x]
-  (- 1.0 (.cumulativeProbability (chi-squared-cdf dof) x)))
+  (- 1.0 (cdf dof x)))
+
 
 (defn chi-squared
   [dof expected observed]

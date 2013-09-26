@@ -168,3 +168,8 @@
                (map? y)) "Both x and y must be maps.")
   (hist->pmf (hist (for [xv (keys x) yv (keys y)]
                      (max xv yv)))))
+
+(defn uniform-pmf
+  [low high steps]
+  (pmf (for [i (range steps)]
+         (+ low (/ (* i (- high low)) (- steps 1.0))))))
