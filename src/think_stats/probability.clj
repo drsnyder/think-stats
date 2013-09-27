@@ -1,8 +1,27 @@
 (ns think-stats.probability
   (:require (think-stats [util :as util]
                          [homeless :as h]
+                         [cdf :as cdf]
                          [random :as random]))
   (:import org.apache.commons.math3.distribution.BinomialDistribution))
+
+(defn event
+  "Returns a funtion that evaluates to the specified events with the given probabilities.
+
+  Example: This example creates an event that will return a 0 5% of the time,
+  a 2 5% of the time and a 1 90% of the time.
+  (def e (event {0 0.05 2 0.05 1 0.9})
+  (repeatedly 1000 #(e (rand))"
+  [event-prob-map]
+  (assert (map? event-prob-map))
+  (let [m (into (sorted-map-by (fn [k1 k2]
+                                 (compare [(get event-prob-map k1) k1]
+                                          [(get event-prob-map k2) k2])))
+                event-prob-map)
+        ks (reductions + (vals m))
+        vs (keys m)]
+    (fn [p]
+      (cdf/cdf->value vs ks p))))
 
 (defn bernoulli-event
   "Generates a function than when called generates a 1 with probability p and a 0 with probability

@@ -31,4 +31,4 @@
              dof   120
              t (stats/alpha->t dof alpha)
              alpha' (stats/t->p-value dof t)]
-         (h/approxiately-equal alpha alpha' 0.009)))
+         (h/approximately-equal alpha alpha' 0.009)))

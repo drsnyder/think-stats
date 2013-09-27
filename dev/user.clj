@@ -19,7 +19,8 @@
                                   [four :as four]
                                   [five :as five]
                                   [six :as six]
-                                  [seven :as seven])
+                                  [seven :as seven]
+                                  [eight :as eight])
             [clj-http.client :as client]
             [clojure.pprint :refer [pprint]]
             [midje.repl :refer :all]

@@ -16,20 +16,20 @@
              sample (repeatedly 1000000 (fn [] (random/normalvariate mu sigma)))
              mean (stats/mean sample)
              stddev (stats/stddev sample)]
-         (h/approxiately-equal mean 5.0) => true
-         (h/approxiately-equal stddev 1.0) => true)
+         (h/approximately-equal mean 5.0) => true
+         (h/approximately-equal stddev 1.0) => true)
        (let [mu 0
              sigma 1
              threshold 0.01
              sample (repeatedly 1000000 (fn [] (random/normalvariate mu sigma)))
              mean (stats/mean sample)
              stddev (stats/stddev sample)]
-         (h/approxiately-equal mean 0.0) => true
-         (h/approxiately-equal stddev 1.0) => true))
+         (h/approximately-equal mean 0.0) => true
+         (h/approximately-equal stddev 1.0) => true))
 
 (facts :normal :rankits
        (every? true? 
-               (map #(h/approxiately-equal (first %) (second %) 0.1)
+               (map #(h/approximately-equal (first %) (second %) 0.1)
                     (map vector (random/rankit-samples 1000) 
                          c/standard-normal-order-statistics))) => true)
 
@@ -38,8 +38,8 @@
              sample (repeatedly 100000 (fn [] (random/expovariate lambda)))
              median (d/percentile sample 50)
              mean (stats/mean sample)]
-         (h/approxiately-equal median (random/expomedian lambda)) => true
-         (h/approxiately-equal mean (random/expomean lambda)) => true))
+         (h/approximately-equal median (random/expomedian lambda)) => true
+         (h/approximately-equal mean (random/expomean lambda)) => true))
 
 (facts :pareto :slow
        (let [alpha 1
@@ -52,9 +52,9 @@
              x2 1
              y2 (Math/log (ccdf (Math/exp x2)))]
          ; intercept at alpha * Log(threshold)
-         (h/approxiately-equal (Math/log (ccdf (Math/exp 0))) (* alpha (Math/log threshold))) => true
+         (h/approximately-equal (Math/log (ccdf (Math/exp 0))) (* alpha (Math/log threshold))) => true
          ; slope at -alpha
-         (h/approxiately-equal (/ (- x2 x1) (- y2 y1)) (* -1 alpha)) => true)
+         (h/approximately-equal (/ (- x2 x1) (- y2 y1)) (* -1 alpha)) => true)
 
 
        (dorun
@@ -64,10 +64,10 @@
                      median (d/percentile sample 50)
                      mean   (stats/mean sample)]]
            (and
-             (h/approxiately-equal median (random/paretomedian alpha x-min) 0.05)
-             (h/approxiately-equal mean (random/paretomean alpha x-min) 0.05)) => true)))
+             (h/approximately-equal median (random/paretomedian alpha x-min) 0.05)
+             (h/approximately-equal mean (random/paretomean alpha x-min) 0.05)) => true)))
 
 (facts :erlang :slow
-  (h/approxiately-equal
+  (h/approximately-equal
     (stats/mean  (repeatedly 10000 #(random/erlangvariate 2 1)))
     0.5) => true)

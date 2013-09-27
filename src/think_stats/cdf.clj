@@ -67,10 +67,10 @@
 (defn pmf->cdf
   "Convert a PMF to a CDF."
   [pmf]
-  (assert (map? cdf) "PMF must be a map.")
+  (assert (map? pmf) "PMF must be a map.")
   (into (sorted-map-by (fn [k1 k2]
-                         (compare (get pmf k1)
-                                  (get pmf k2))))
+                         (compare [(get pmf k2) k2]
+                                  [(get pmf k1) k1])))
         pmf))
 
 

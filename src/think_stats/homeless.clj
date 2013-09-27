@@ -97,11 +97,11 @@
             [l h] (compute-bisection-ends dir s x low mid high)]
         (recur l h)))))
 
-(defn approxiately-equal
+(defn approximately-equal
   ([a b r]
    (>= r (Math/abs (- a b))))
   ([a b]
-   (approxiately-equal a b 0.01)))
+   (approximately-equal a b 0.01)))
 
 (defn round
   "Round number to decimals digits."
