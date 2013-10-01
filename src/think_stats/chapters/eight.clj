@@ -4,7 +4,8 @@
               [stats :as stats]
               [probability :as p]
               [hist :as hist]
-              [random :as random])))
+              [random :as random]
+              [estimation :as estimation])))
 
 (defn vote
   [m]
@@ -22,8 +23,31 @@
         b (repeatedly iter #(h/sum (repeatedly b-votes v)))]
     (map vector a b)))
 
-;(defn vote-sim
-  ;[cdf count-a count-b iter]
-  ;(let [a]))
 
+(comment
+  ; section 8.7
+  ; h is the prior
+  (def h (hist/uniform-pmf 0.5 1.5 10))
+  ; evidence is the posterior
+  (def evidence  [2.675, 0.198, 1.152, 0.787, 2.717, 4.269])
+  ; the most likely
+  (def prob-map
+    (estimation/update-pmf h evidence (partial likelihood random/expopdf)))
+  (apply max-key val prob-map))
+
+(comment
+  ; problem 8.4
+  ; h is the prior
+  (def h (hist/uniform-pmf 0.1 1.5 100))
+  ; evidence is the posterior
+  (def evidence  [1.5, 2, 3, 4, 5, 12])
+  ; the most likely
+  (def prob-map
+    (estimation/update-pmf
+      h
+      evidence
+      ; what do we provide for lower and upper here?
+      (partial likelihood  (fn [lambda x]
+                             (cdf/cdf->probbability-range (partial cdf/expocdf lambda))))))
+  (apply max-key val prob-map))
 

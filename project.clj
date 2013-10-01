@@ -14,5 +14,5 @@
   :profiles {:dev {:source-paths ["dev"]
                    :plugins [[lein-midje "3.0.0"]]
                    :dependencies [[org.clojure/tools.nrepl "0.2.3"]
-                                  [org.clojure/tools.namespace "0.2.3"]]}}
+                                  [org.clojure/tools.namespace "0.2.4"]]}}
   :jvm-opts ["-Xmx1G" "-server"])

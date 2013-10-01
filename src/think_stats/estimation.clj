@@ -3,17 +3,6 @@
   (:require (think-stats [random :as random]
                          [hist :as hist])))
 
-(comment
-  ; section 8.7
-  ; h is the prior
-  (def h (hist/uniform-pmf 0.5 1.5 10))
-  ; evidence is the posterior
-  (def evidence  [2.675, 0.198, 1.152, 0.787, 2.717, 4.269])
-  ; the most likely
-  (def prob-map
-    (estimation/update-pmf h evidence (partial likelihood random/expopdf)))
-  (apply max-key val prob-map))
-
 (defn update-pmf
   [pmf evidence f]
   ; normalize the compute the posterior distributions
