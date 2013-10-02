@@ -75,4 +75,6 @@
                    (/ 1.0 num-trains))))))
   (apply max-key val posterior-map)
   (def m  (into  (sorted-map) posterior-map))
-  (def cdf (into  (sorted-map-by  (fn  [k1 k2]  (compare  [(get posterior-map k1) k1]  [(get posterior-map k2) k2]))) posterior-map)))
+  (def sorted-by-posterior 
+    (into  (sorted-map-by  (fn  [k1 k2]  (compare  [(get posterior-map k1) k1]  [(get posterior-map k2) k2]))) posterior-map))
+  (def c  (cdf/pmf->cdf sorted-by-posterior)))
