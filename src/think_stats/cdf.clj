@@ -68,10 +68,17 @@
   "Convert a PMF to a CDF."
   [pmf]
   (assert (map? pmf) "PMF must be a map.")
-  (into (sorted-map-by (fn [k1 k2]
-                         (compare [(get pmf k2) k2]
-                                  [(get pmf k1) k1])))
-        pmf))
+  ; FIXME: make this a fn
+  ; FIXME: from here we need to divide the value by the reductions
+  (let [m (into (sorted-map-by (fn [k1 k2] ; order by the values
+                         (compare [(get pmf k1) k1]
+                                  [(get pmf k2) k2])))
+        pmf)]
+    (into (sorted-map-by (fn [k1 k2]
+                           (compare [(get pmf k1) k1]
+                                    [(get pmf k2) k2])))
+          (for [[k v] (map vector (keys m) (reductions + (vals m)))]
+            [k v]))))
 
 
 (defn cdf->probability
