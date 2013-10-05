@@ -14,6 +14,8 @@
               [hist :as hist]
               [cdf :as cdf]
               [plots :as plots]
+              [estimation :as estimation]
+              [correlation :as cor]
               [chi-squared :as chi-squared])
             (think-stats.chapters [three :as three]
                                   [four :as four]
