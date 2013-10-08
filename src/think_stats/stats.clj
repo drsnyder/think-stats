@@ -34,6 +34,17 @@
                   (/ (+ upper lower) 2))
       :else (nth s (quot n 2)))))
 
+(defn mean-deviations
+  "Compute the deviations between Xi and e (e.g. the mean of X). Apply f to each deviation. If not supplied,
+  f defaults to identity."
+  ([X e f]
+   (assert (and (sequential? X) (number? e) (fn? f)))
+   (map (fn [Xi]
+          (f (- Xi e)))
+        X))
+  ([X e]
+   (mean-deviations X e identity)))
+
 
 (defmulti mean-variance
   "Compute the mean difference of each element in s and apply f to computed value.
@@ -41,11 +52,13 @@
   as a histogram."
   (fn [s f n m] (class s)))
 
+; FIXME: use mean-deviations here
 (defmethod mean-variance :types/seq
   [s f n m]
   (/ (h/sum (map #(f (- % m)) s))
      n))
 
+; FIXME: use mean-deviations here
 (defmethod mean-variance :types/map
   [s f n m]
   ; when we have a map we are working with a histogram. in this case, multiply
@@ -243,7 +256,6 @@
   (let [p (if two-tailed (/ alpha 2.0) alpha)]
     (Math/abs (.inverseCumulativeProbability (t-distribution dof) p))))
 
-
 (comment
   (def sample  (repeatedly 1000 random/rankit-sample))
   (stats/mean-squared-error 0  (map stats/mean sample) 1000))
@@ -251,7 +263,7 @@
 (defn mean-error
   "Compute the mean error given an exstimator and a collection."
   ([estimator mean-coll m f]
-   (/ (h/sum (map #(f (- % estimator)) mean-coll)) m))
+   (/ (h/sum (mean-deviations mean-coll estimator f)) m))
   ([estimator mean-coll m]
    (mean-error estimator mean-coll m identity))
   ([estimator mean-coll]
