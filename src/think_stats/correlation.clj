@@ -59,4 +59,12 @@
                      (sum-squares Y Yu))))))
 
 (defn z-r
-  [X Y])
+  [X Y]
+  (let [{Xn :count-x Yn :count-y Xu :mean-x Yu :mean-y :as summary} (summary-stats X Y)
+        Xsd (stats/stddev X Xn)
+        Ysd (stats/stddev Y Yn)]
+    (/ (h/sum (map #(apply * %)
+                   (map vector
+                        (map #(stats/z % Xu Xsd) X)
+                        (map #(stats/z % Yu Ysd) Y))))
+       Xn)))
