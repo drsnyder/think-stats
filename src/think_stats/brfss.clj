@@ -18,11 +18,15 @@
   [data-file]
   (let [data (util/read-file data-file :gunzip true)
         db (map (partial s/line->fields fields) data)
-        predicate (fn [r]
+        weight-check (fn [r]
                     (when-let [weight (get r "weight2" nil)]
                       (and (number? weight)
                            (not= weight 7777)
                            (not= weight 9999))))
+        height-check (fn [r]
+                       (when-let [height (get r "htm3")]
+                         (and (number? height)
+                              (not= height 999))))
         clean (fn [r field]
                 (let [v (get r field nil)]
                   (if (number? v)
@@ -30,6 +34,6 @@
                             (< v 1000) (update-in [field] #(/ % 2.2))
                             (and (> v 9000) (< v 9999)) (update-in [field] #(- % 9000)))
                     r)))
-        all (for [r db :when (and (not (nil? r)) (predicate r))]
+        all (for [r db :when (and (not (nil? r)) (weight-check r) (height-check r))]
               (-> r (clean "weight2") (clean "wtyrago")))]
     all))

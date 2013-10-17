@@ -52,6 +52,7 @@
                    (stats/mean-deviations Y Yu)))))
 
 (defn raw-r
+  "This method appears to be the fastest in their current forms."
   [X Y]
   (let [{Xn :count-x Yn :count-y Xu :mean-x Yu :mean-y :as summary} (summary-stats X Y)]
     (/ (sum-deviation-products X Xu Y Yu)

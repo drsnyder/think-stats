@@ -14,7 +14,7 @@
   "
   [s k]
   (let [scaled-k (* (count s) (/ k 100))
-        s (vec s)] 
+        s (vec s)]
     (h/select s 0 (dec (count s)) scaled-k)))
 
 (defn percentile-rank
@@ -53,3 +53,36 @@
   (/
     (count (filter #(<= % x) s))
     (count s)))
+
+; TODO testing everything below
+(defn average-ranks
+  [idx n]
+  (if (= n 1)
+    (list idx)
+    (let [mean (/ (reduce + (range (- idx (dec n)) (inc idx))) n) ]
+      (repeat n mean))))
+
+(defn lazy-rank-seq
+  ([l]
+   (let [s (sort l)
+         n (count l)
+         order (into (sorted-map)
+                     (for [[idx i] (map vector s (range 1 (inc n)))]
+                       [idx i]))]
+
+     (lazy-rank-seq order l)))
+  ([order l]
+   (when-let [rank (order (first l))]
+     (cons rank (lazy-seq (lazy-rank-seq order (rest l)))))))
+
+(defn rank-seq
+  [l]
+  (loop [ls (lazy-rank-seq l)
+         acc ()]
+    (if (empty? ls)
+      acc
+      (let [i (first ls)
+            batch (conj (take-while #(= i %) (rest ls)) i)
+            batch-len (count batch)]
+        (recur (drop (count batch) ls)
+               (concat acc (average-ranks i batch-len)))))))
