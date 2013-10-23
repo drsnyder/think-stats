@@ -58,18 +58,19 @@
 (defn average-ranks
   [idx n]
   (if (= n 1)
-    (list idx)
-    (let [mean (/ (reduce + (range (- idx (dec n)) (inc idx))) n) ]
-      (repeat n mean))))
+    idx
+    (let [mean (/ (reduce + (range (- idx n) idx)) n) ]
+      mean)))
 
 (defn lazy-rank-seq
   ([l]
    (let [s (sort l)
+         freq (frequencies s)
          n (count l)
-         order (into (sorted-map)
-                     (for [[idx i] (map vector s (range 1 (inc n)))]
-                       [idx i]))]
-
+         order (into {}
+                     (for [[idx i] (map vector freq (reductions + (vals freq)))]
+                       [(first idx) (average-ranks (inc i) (second idx))]))]
+     (prn order)
      (lazy-rank-seq order l)))
   ([order l]
    (when-let [rank (order (first l))]
