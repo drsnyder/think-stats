@@ -54,36 +54,25 @@
     (count (filter #(<= % x) s))
     (count s)))
 
-; TODO testing everything below
 (defn average-ranks
+  "Determine the average ranks for n items at offset idx."
   [idx n]
   (if (= n 1)
     idx
     (let [mean (/ (reduce + (range (- idx n) idx)) n) ]
       mean)))
 
-(defn lazy-rank-seq
+(defn rank-seq
+  "Returns a lazy ranked sequence of the elements in l. Uses fractional ranking (http://en.wikipedia.org/wiki/Ranking)."
   ([l]
-   (let [s (sort l)
-         freq (frequencies s)
-         n (count l)
+   (let [n (count l)
+         freq (into (sorted-map) (frequencies l))
          order (into {}
                      (for [[idx i] (map vector freq (reductions + (vals freq)))]
-                       [(first idx) (average-ranks (inc i) (second idx))]))]
-     (prn order)
-     (lazy-rank-seq order l)))
+                       [(first idx) (if (> (second idx) 1)
+                                      (average-ranks (inc i) (second idx))
+                                      i)]))]
+     (rank-seq order l)))
   ([order l]
    (when-let [rank (order (first l))]
      (cons rank (lazy-seq (lazy-rank-seq order (rest l)))))))
-
-(defn rank-seq
-  [l]
-  (loop [ls (lazy-rank-seq l)
-         acc ()]
-    (if (empty? ls)
-      acc
-      (let [i (first ls)
-            batch (conj (take-while #(= i %) (rest ls)) i)
-            batch-len (count batch)]
-        (recur (drop (count batch) ls)
-               (concat acc (average-ranks i batch-len)))))))
