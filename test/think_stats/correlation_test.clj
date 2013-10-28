@@ -11,5 +11,9 @@
 
 (facts :pearsons
   (let [x (repeatedly 1000 #(rand-int 100))]
-    (h/round (cor/pearsons-correlation x x) 6) => 1.0M))
+    (cor/pearsons-correlation x x) => (roughly 1.0)))
+
+(facts :spearmans
+  (let [x (repeatedly 1000 #(rand-int 100))]
+    (cor/spearmans-rank-correlation x x) => (roughly 1.0)))
 

@@ -1,6 +1,7 @@
 (ns think-stats.correlation
   (:require (think-stats
               [stats :as stats]
+              [distributions :as d]
               [homeless :as h])))
 
 (defn- summary-stats
@@ -69,3 +70,7 @@
                         (map #(stats/z % Xu Xsd) X)
                         (map #(stats/z % Yu Ysd) Y))))
        Xn)))
+
+(defn spearmans-rank-correlation
+  [X Y]
+  (pearsons-correlation (d/rank-seq X) (d/rank-seq Y)))

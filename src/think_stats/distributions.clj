@@ -75,4 +75,4 @@
      (rank-seq order l)))
   ([order l]
    (when-let [rank (order (first l))]
-     (cons rank (lazy-seq (lazy-rank-seq order (rest l)))))))
+     (cons rank (lazy-seq (rank-seq order (rest l)))))))

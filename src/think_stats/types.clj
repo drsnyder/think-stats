@@ -8,3 +8,4 @@
 (derive clojure.lang.PersistentList :types/seq)
 (derive clojure.lang.LazySeq :types/seq)
 (derive clojure.lang.ArraySeq :types/seq)
+(derive clojure.lang.Cons :types/seq)
