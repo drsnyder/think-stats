@@ -153,20 +153,31 @@
 (defn weibullvariate
   "See http://en.wikipedia.org/wiki/Weibull_distribution.
 
-  A transformation that should produce a straight line:
-  log(-log(y)) = log(x)
-  [ log(-log(y)) = klog(x) - klog(lambda) ]
+  A transformation that should produce a straight line (4.5):
+  log(log(1/(1-y))) = beta*log(x) - beta*log(lambda)
+  y = b + ax
+  intercept = beta * log(lambda)
+  slope = beta*log(x)
 
   Example:
-  (def w (repeatedly 100000 #(d/weibullvariate 1 0.5)))
+  (def w (repeatedly 100000 #(random/weibullvariate 1 0.5)))
   (def cdf (cdf/cdf w))
   ; < 2.5 to match the wikipedia page for comparison
+  ; FIXME: compute the CCDF
   (def cdf (into {} (for [k (filter #(< % 2.5) (keys cdf))] [k (get cdf k))))
   (plots/line (keys cdf) (vals cdf))
   "
   [lambda beta]
   (* lambda (Math/pow (* -1.0 (Math/log (- 1.0 (rand))))
                       (/ 1.0 beta))))
+
+(defn weibull-line
+  [s lambda beta]
+  (let [cdf (cdf/cdf s)
+        x (keys cdf)
+        y (vals cdf)]
+    [(map #(- (* beta (Math/log %)) (* beta (Math/log lambda))))
+     (map #(Math/log (Math/log (/ (- 1 %)) )) y)]))
 
 (defn paretovariate
   "See http://en.wikipedia.org/wiki/Pareto_distribution for random sample generation."

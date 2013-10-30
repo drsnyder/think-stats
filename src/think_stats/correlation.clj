@@ -74,3 +74,13 @@
 (defn spearmans-rank-correlation
   [X Y]
   (pearsons-correlation (d/rank-seq X) (d/rank-seq Y)))
+
+
+
+(defn least-squares
+  [X Y]
+  (let [{Xn :count-x Yn :count-y Xu :mean-x Yu :mean-y :as summary} (summary-stats X Y)
+        Xvar (stats/mean-variance X h/square Xn Xu)
+        slope (/ (cov X Y) Xvar)]
+   {:slope slope
+   :intercept (- Yu (* slope Xu))}))
