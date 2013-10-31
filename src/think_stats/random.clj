@@ -155,9 +155,9 @@
 
   A transformation that should produce a straight line (4.5):
   log(log(1/(1-y))) = beta*log(x) - beta*log(lambda)
-  y = b + ax
-  intercept = beta * log(lambda)
-  slope = beta*log(x)
+  y = mx + b
+  intercept = -beta * log(lambda)
+  slope = beta
 
   Example:
   (def w (repeatedly 100000 #(random/weibullvariate 1 0.5)))
@@ -174,10 +174,10 @@
 (defn weibull-line
   [s lambda beta]
   (let [cdf (cdf/cdf s)
-        x (keys cdf)
-        y (vals cdf)]
-    [(map #(- (* beta (Math/log %)) (* beta (Math/log lambda))))
-     (map #(Math/log (Math/log (/ (- 1 %)) )) y)]))
+        x (butlast (keys cdf))
+        y (butlast (vals cdf))]
+    [(map #(- (* beta (Math/log %)) (* beta (Math/log lambda))) x)
+     (map #(Math/log (Math/log (/ 1.0 (- 1.0 %)) )) y)]))
 
 (defn paretovariate
   "See http://en.wikipedia.org/wiki/Pareto_distribution for random sample generation."
