@@ -157,10 +157,10 @@
   log(log(1/(1-y))) = beta*log(x) - beta*log(lambda)
   y = b + ax
   intercept = beta * log(lambda)
-  slope = beta*log(x)
+  slope = beta
 
   Example:
-  (def w (repeatedly 100000 #(random/weibullvariate 1 0.5)))
+  (def w (repeatedly 100000 #(random/weibullvariate 1.0 0.5)))
   (def cdf (cdf/cdf w))
   ; < 2.5 to match the wikipedia page for comparison
   ; FIXME: compute the CCDF
@@ -174,9 +174,9 @@
 (defn weibull-line
   [s lambda beta]
   (let [cdf (cdf/cdf s)
-        x (keys cdf)
-        y (vals cdf)]
-    [(map #(- (* beta (Math/log %)) (* beta (Math/log lambda))))
+        x (butlast (keys cdf))  ; exclude the last item which is one
+        y (butlast (vals cdf))] ; and keep the lengths equal
+    [(map #(- (* beta (Math/log %)) (* beta (Math/log lambda))) x)
      (map #(Math/log (Math/log (/ (- 1 %)) )) y)]))
 
 (defn paretovariate
