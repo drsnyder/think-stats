@@ -153,31 +153,37 @@
 (defn weibullvariate
   "See http://en.wikipedia.org/wiki/Weibull_distribution.
 
+  scale = lambda
+  shape = k
+
   A transformation that should produce a straight line (4.5):
-  log(log(1/(1-y))) = beta*log(x) - beta*log(lambda)
-  y = b + ax
-  intercept = beta * log(lambda)
-  slope = beta
+  log(log(1/(1-y))) = k*log(x) - k*log(lambda)
+  y = mx + b
+  intercept = -k * log(lambda)
+  slope = k
 
   Example:
-  (def w (repeatedly 100000 #(random/weibullvariate 1.0 0.5)))
+  (def w (repeatedly 100000 #(random/weibullvariate 0.5)))
   (def cdf (cdf/cdf w))
   ; < 2.5 to match the wikipedia page for comparison
   ; FIXME: compute the CCDF
   (def cdf (into {} (for [k (filter #(< % 2.5) (keys cdf))] [k (get cdf k))))
   (plots/line (keys cdf) (vals cdf))
   "
-  [lambda beta]
-  (* lambda (Math/pow (* -1.0 (Math/log (- 1.0 (rand))))
-                      (/ 1.0 beta))))
+  ([k lambda]
+   (* lambda (Math/pow (* -1.0 (Math/log (- 1.0 (rand))))
+               (/ 1.0 k))))
+  ([k]
+   (weibullvariate k 1.0)))
 
 (defn weibull-line
-  [s lambda beta]
+  [s]
   (let [cdf (cdf/cdf s)
-        x (butlast (keys cdf))  ; exclude the last item which is one
-        y (butlast (vals cdf))] ; and keep the lengths equal
-    [(map #(- (* beta (Math/log %)) (* beta (Math/log lambda))) x)
-     (map #(Math/log (Math/log (/ (- 1 %)) )) y)]))
+        x (butlast (keys cdf))
+        y (butlast (vals cdf))
+        transform (fn [x] (Math/log (Math/log x)))]
+    [(map #(Math/log %) x)
+     (map #(transform (/ 1.0 (- 1.0 %))) y)]))
 
 (defn paretovariate
   "See http://en.wikipedia.org/wiki/Pareto_distribution for random sample generation."
