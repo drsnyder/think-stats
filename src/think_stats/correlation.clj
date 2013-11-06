@@ -75,8 +75,6 @@
   [X Y]
   (pearsons-correlation (d/rank-seq X) (d/rank-seq Y)))
 
-
-
 (defn least-squares
   [X Y]
   (let [{Xn :count-x Yn :count-y Xu :mean-x Yu :mean-y :as summary} (summary-stats X Y)
@@ -84,3 +82,24 @@
         slope (/ (cov X Y) Xvar)]
    {:slope slope
    :intercept (- Yu (* slope Xu))}))
+
+(defn residuals
+  "Generate a sequence of residuals given X, Y an intercept and the slope.
+  intercept: alpha
+  slope: beta
+  "
+  [X Y intercept slope]
+  (let [predict (fn [x]
+                  (+ intercept (* slope x)))
+        predicted (map predict X)]
+    (for [[Yi Ypred] (map vector Y predicted)]
+      (- Yi Ypred))))
+
+(defn coef-determination
+  "R^2"
+  ([Y residuals Yn Yu en eu]
+  (- 1.0 (/ (stats/mean-variance residuals h/square en eu)
+            (stats/mean-variance Y h/square Yn Yu))))
+  ([Y residuals]
+    (let [{en :count-x Yn :count-y eu :mean-x Yu :mean-y :as summary} (summary-stats residuals Y)]
+      (coef-determination Y residuals Yn Yu en eu))))

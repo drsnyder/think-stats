@@ -31,3 +31,13 @@
     ; the intercept should be 0
     (:intercept model) => (roughly (* k (Math/log lambda)) 0.006)))
 
+(facts :coef-determination
+  (let [k 0.5
+        lambda 1.0
+        w (repeatedly 100000 #(random/weibullvariate k lambda))
+        [x y] (random/weibull-line w)
+        w-model  (cor/least-squares x y)
+        resid  (cor/residuals x y (:intercept w-model) (:slope w-model))
+        rsquared (cor/coef-determination y resid)
+        p (cor/pearsons-correlation x y)]
+    (h/square p) => (roughly rsquared 0.0001)))
