@@ -76,12 +76,13 @@
   (pearsons-correlation (d/rank-seq X) (d/rank-seq Y)))
 
 (defn least-squares
+  "Computes the slope and intercept using linear least squares fit."
   [X Y]
   (let [{Xn :count-x Yn :count-y Xu :mean-x Yu :mean-y :as summary} (summary-stats X Y)
         Xvar (stats/mean-variance X h/square Xn Xu)
         slope (/ (cov X Y) Xvar)]
-   {:slope slope
-   :intercept (- Yu (* slope Xu))}))
+   {:slope slope                     ; beta
+   :intercept (- Yu (* slope Xu))})) ; alpha
 
 (defn residuals
   "Generate a sequence of residuals given X, Y an intercept and the slope.
