@@ -15,7 +15,7 @@
              (s/def-field-extractor "prglength" 274 276)
              (s/def-field-extractor "outcome" 276 277)
              (s/def-field-extractor "birthord" 277 279)
-             (s/def-field-extractor "agepreg" 284 287)
+             (s/def-field-extractor "agepreg" 283 287)
              (s/def-field-extractor "finalwgt" 422 440 util/str-to-float)])
 
 (declare load-data)
@@ -107,7 +107,8 @@
          (get r "birthwgt_oz")
          (< (get r "birthwgt_oz") 16)) (assoc "totalwgt_oz"
                                               (+ (* (get r "birthwgt_lb") 16)
-                                                 (get r "birthwgt_oz")))))
+                                                 (get r "birthwgt_oz")))
+    (get r "agepreg") (assoc "agepreg" (/ (get r "agepreg") 100.0))))
 
 ; FIXME: return the whole record not just the column. let another function filter out the column
 (defn load-data
@@ -146,5 +147,5 @@
          live-births  (for [r db :when (and (predicate r))]
                         r)]
      live-births))
-  ([column]
-   (load-births "data/2002FemPreg.dat.gz" :column column)))
+  ([]
+   (load-births "data/2002FemPreg.dat.gz")))
